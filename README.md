@@ -16,7 +16,7 @@
 1. Clone o repositório:
    ```sh
    git clone https://github.com/seu-usuario/picolynne-store.git
-   cd picolynne-store
+   cd picolynne_store
     ```
 2. Instale as dependências
     ```sh
