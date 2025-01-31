@@ -1,0 +1,27 @@
+# Ambiente Virtual
+venv/
+
+# Arquivos de cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos do editor de código (como VSCode, Sublime Text, etc)
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Dependências do Python que podem ser geradas por builds (caso seja necessário)
+*.egg-info/
+dist/
+build/
+*.whl
