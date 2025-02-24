@@ -23,3 +23,5 @@ class ProductBase(Base):
         secondary=ProductTagAssociation,
         back_populates="products",
     )
+
+    sale_items = relationship("SaleItemBase", back_populates="product")
