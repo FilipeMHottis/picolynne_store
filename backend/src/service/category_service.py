@@ -40,6 +40,13 @@ class CategoryService:
                 )
             return Response(code=404, message="Category not found.", data=None)
         except Exception as e:
+            if str(e) == "Category not found.":
+                return Response(
+                    code=404,
+                    message="Customer not found.",
+                    data=None,
+                )
+
             return Response(
                 code=500,
                 message=f"Error fetching category by ID: {str(e)}",
@@ -60,6 +67,13 @@ class CategoryService:
                 )
             return Response(code=404, message="Category not found.", data=None)
         except Exception as e:
+            if str(e) == "Category not found.":
+                return Response(
+                    code=404,
+                    message="Customer not found.",
+                    data=None,
+                )
+
             return Response(
                 code=500,
                 message=f"Error fetching category by name: {str(e)}",

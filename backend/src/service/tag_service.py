@@ -40,6 +40,13 @@ class TagService:
                 )
             return Response(code=404, message="Tag not found.", data=None)
         except Exception as e:
+            if str(e) == "Tag not found.":
+                return Response(
+                    code=404,
+                    message="Customer not found.",
+                    data=None,
+                )
+
             return Response(
                 code=500,
                 message=f"Error fetching tag by ID: {str(e)}",
@@ -60,6 +67,13 @@ class TagService:
                 )
             return Response(code=404, message="Tag not found.", data=None)
         except Exception as e:
+            if str(e) == "Tag not found.":
+                return Response(
+                    code=404,
+                    message="Customer not found.",
+                    data=None,
+                )
+
             return Response(
                 code=500,
                 message=f"Error fetching tag by name: {str(e)}",
