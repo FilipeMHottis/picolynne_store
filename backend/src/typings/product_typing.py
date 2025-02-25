@@ -9,6 +9,7 @@ class Product(BaseModel):
     name: str
     description: str
     category: Category
+    stock: Optional[int] = 0  # Correção aqui
     tags: List[Tag] = []
 
     class Config:
@@ -19,6 +20,7 @@ class Product(BaseModel):
 class ProductCreate(BaseModel):
     name: str
     description: str
+    stock: int = 0
     category_id: int
     tags_id: List[int] = []
 

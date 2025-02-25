@@ -9,6 +9,7 @@ from ..controller.tag_controller import router as tag_router
 from ..controller.category_controller import router as category_router
 from ..controller.product_controller import router as product_router
 from ..controller.customer_controller import router as customer_router
+from ..controller.sale_controller import router as sale_router
 
 app = FastAPI()
 
@@ -20,6 +21,7 @@ app.include_router(tag_router)
 app.include_router(category_router)
 app.include_router(product_router)
 app.include_router(customer_router)
+app.include_router(sale_router)
 
 
 @app.get("/")

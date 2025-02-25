@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 if database["START_DEV"]:
-    DATABASE_URL = "sqlite:///./picolynne_store_dev.db"
+    DATABASE_URL = "sqlite:///./picolynne_store.dev.db"
 else:
     DATABASE_URL = (
         f"postgresql://{database['DB_USER']}:"

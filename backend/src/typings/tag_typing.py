@@ -1,8 +1,9 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class Tag(BaseModel):
-    id: int
+    id: Optional[int] = None
     name: str
 
     class Config:

@@ -204,6 +204,7 @@ class ProductModel:
                 name=product.name,
                 description=product.description,
                 category_id=category.id,
+                stock=product.stock,
             )
 
             self.db.add(new_product)
@@ -232,7 +233,9 @@ class ProductModel:
             raise Exception(f"Database error: {str(e)}")
 
     def update_product(
-        self, product_id: int, product_data: ProductCreate
+        self,
+        product_id: int,
+        product_data: ProductCreate,
     ) -> Product:
         """Atualiza um produto existente com categoria e tags completas."""
         try:
@@ -258,6 +261,7 @@ class ProductModel:
             product_to_update.name = product_data.name
             product_to_update.description = product_data.description
             product_to_update.category_id = category.id
+            product_to_update.stock = product_data.stock
 
             self.db.execute(
                 ProductTagAssociation.delete().where(
@@ -305,6 +309,29 @@ class ProductModel:
             # Deletar o produto
             self.db.delete(product)
             self.db.commit()
+
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            raise Exception(f"Database error: {str(e)}")
+
+    def update_stock(self, product_id: int, quantity: int) -> Product:
+        """Atualiza o estoque de um produto."""
+        try:
+            product = (
+                self.db.query(ProductBase)
+                .filter(
+                    ProductBase.id == product_id,
+                )
+                .first()
+            )
+            if not product:
+                raise Exception("Product not found.")
+
+            product.stock += quantity
+            self.db.commit()
+            self.db.refresh(product)
+
+            return Product.model_validate(product)
 
         except SQLAlchemyError as e:
             self.db.rollback()
