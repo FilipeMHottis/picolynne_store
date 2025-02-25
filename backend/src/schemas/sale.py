@@ -8,6 +8,7 @@ class SaleBase(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"))
+    total_quantity = Column(Integer)
     total_price = Column(Float)
 
     customer = relationship("CustomerBase", back_populates="sales")
