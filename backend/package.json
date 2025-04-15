@@ -2,10 +2,10 @@
   "name": "picolynne-store-backend",
   "version": "1.0.0",
   "description": "Backend para o aplicativo Picolynne Store",
-  "main": "src/main.py",
+  "main": "src/app/main.py",
   "scripts": {
     "install-dependencies": "pip install -r requirements.txt",
-    "start-dev": "uvicorn src.app.main:app --reload"
+    "start": "python3 -u start_app.py"
   },
   "author": "Filipe M Hottis",
   "license": "Apache-2.0"
