@@ -26,7 +26,3 @@ Thumbs.db
 dist/
 build/
 *.whl
-
-
-# Data Base for Deb
-*.dev.db

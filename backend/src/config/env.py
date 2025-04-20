@@ -24,3 +24,8 @@ security = {
     "ADMIN_USER": os.getenv("ADMIN_USER", "admin"),
     "ADMIN_PASSWORD": os.getenv("ADMIN_PASSWORD", "admin"),
 }
+
+serve_config = {
+    "PORT": int(os.getenv("PORT", 8000)),
+    "HOST": os.getenv("HOST", "0.0.0.0"),
+}
