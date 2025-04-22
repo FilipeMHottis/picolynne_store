@@ -1,5 +1,6 @@
 # Import FastAPI
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import database initialization
 from ..database.init_db import init_database
@@ -17,6 +18,15 @@ from ..controller.auth_controller import router as auth_router
 from ..middleware.auth_middleware import AuthMiddleware
 
 app = FastAPI()
+
+# Set CORS settings
+app.add_middleware(
+    CORSMiddleware,  # type: ignore
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize database
 init_database()
