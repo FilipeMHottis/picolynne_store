@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../utils/apiRequest";
 import { BACKEND_URL } from "../utils/env";
 import StorageUtil from "../utils/storageUtil";
@@ -38,6 +39,8 @@ const login = async (
 };
 
 function Login() {
+  const navigate = useNavigate();
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -55,6 +58,10 @@ function Login() {
       // Store user and token in session storage
       StorageUtil.setItem("user", user);
       StorageUtil.setItem("token", token);
+
+      // Redirect to the home page
+      navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Login error:", error);
       
