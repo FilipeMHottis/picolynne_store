@@ -21,12 +21,15 @@ export default function LoginPopup() {
 
     return (
         <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-white/30"
             role="dialog"
             aria-modal="true"
             aria-labelledby="popup-title"
         >
-            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full text-center animate-fade-in">
+            <div
+                className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center border border-gray-200"
+                onClick={(e) => e.stopPropagation()} // evita propagação de clique
+            >
                 <h2 id="popup-title" className="text-2xl font-bold mb-3 text-gray-800">
                     Você não está logado
                 </h2>
@@ -41,5 +44,5 @@ export default function LoginPopup() {
                 </button>
             </div>
         </div>
-);
+    );
 }
