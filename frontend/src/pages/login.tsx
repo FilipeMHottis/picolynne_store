@@ -7,12 +7,6 @@ import "../animations/shack.css"
 
 const LOGIN_URL = `${BACKEND_URL}/login`;
 
-interface LoginResponse {
-  code: number;
-  message: string;
-  data: string;
-}
-
 interface LoginRequest {
   username: string;
   password: string;
@@ -21,11 +15,11 @@ interface LoginRequest {
 const login = async (
   username: string,
   password: string
-): Promise<LoginResponse> => {
+) => {
   const requestBody: LoginRequest = { username, password };
 
   try {
-    const response = await apiRequest<LoginResponse>({
+    const response = await apiRequest<string>({
       method: "POST",
       url: LOGIN_URL,
       body: requestBody,

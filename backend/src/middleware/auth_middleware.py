@@ -18,6 +18,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next):
+        if request.method == "OPTIONS":
+            return await call_next(request)
+        
         if request.url.path in pages_not_requiring_auth:
             return await call_next(request)
 

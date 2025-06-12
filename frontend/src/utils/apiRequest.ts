@@ -7,7 +7,13 @@ interface ApiRequestOptions {
     body?: Record<string, any>;
 }
 
-async function apiRequest<T>({ method, url, headers, body }: ApiRequestOptions): Promise<T> {
+interface returnResponse<T> {
+    code: number;
+    message: string;
+    data: T;
+}
+
+async function apiRequest<T>({ method, url, headers, body }: ApiRequestOptions): Promise<returnResponse<T>> {
     const options: RequestInit = {
         method,
         headers: {
@@ -26,7 +32,7 @@ async function apiRequest<T>({ method, url, headers, body }: ApiRequestOptions):
         throw new Error(`HTTP error! status: ${response.status}\n ${await response.text()}`);
     }
 
-    return response.json() as Promise<T>;
+    return response.json() as Promise<returnResponse<T>>;
 }
 
 export {
