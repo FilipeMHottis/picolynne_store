@@ -26,3 +26,7 @@ Thumbs.db
 dist/
 build/
 *.whl
+
+# Bancos de dados SQLite
+*.sqlite3
+*.db
