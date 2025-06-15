@@ -3,6 +3,8 @@ import { BACKEND_URL } from "../utils/env";
 import { useState, useEffect } from "react";
 import StorageUtil from "../utils/storageUtil";
 import Navegate from "../components/navegate";
+import { Edit3, Trash2, PlusCircle } from "lucide-react";
+
 
 interface Response<T> {
     code: number;
@@ -135,79 +137,68 @@ function Categories() {
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
             <Navegate />
 
-            <h1 className="text-4xl font-bold mb-8">Categorias</h1>
+            <h1 className="text-4xl font-bold mb-8 text-center">Categorias</h1>
 
-            <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-6">
+            <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8">
                 <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold">Lista de Categorias</h2>
 
-                    <h2 className="text-2xl font-semibold mb-4">Lista de Categorias</h2>
-
-                    {/* add botao ao lado de lista de categorias, botao para com escritop criar nova categoria */}
                     <button
-                        onClick={() => createCategory({ 
-                            name: "Nova Categoria", 
-                            price: 0, 
-                            price_above_20_units: 0, 
-                            price_above_50_units: 0 
-                        })}
-                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-yellow-400 transition-colors"
+                        onClick={() => createCategory({ name: "Nova Categoria", price: 0, price_above_20_units: 0, price_above_50_units: 0 })}
+                        className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                        title="Criar nova categoria"
                     >
+                        <PlusCircle className="mr-2" />
                         Criar Categoria
                     </button>
                 </div>
 
+                {categories.length === 0 ? (
+                    <p className="text-gray-500 text-center">Nenhuma categoria encontrada.</p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {categories.map(category => (
+                            <div 
+                                key={category.id} 
+                                className="bg-gray-50 p-4 rounded-xl shadow hover:shadow-md transition-shadow flex flex-col justify-between"
+                            >
+                                <h3 
+                                    className="text-xl font-bold mb-2 flex items-center gap-2"
+                                >
+                                    📦 {category.name}
+                                </h3>
+                                
+                                <p className="text-gray-700">💰 Preço: R$ {category.price.toFixed(2)}</p>
+                                <p className="text-gray-700">📦 +20 und: R$ {category.price_above_20_units.toFixed(2)}</p>
+                                <p className="text-gray-700">📦 +50 und: R$ {category.price_above_50_units.toFixed(2)}</p>
 
-
-                { categories.length === 0 ? (
-                    <p className="text-gray-500">Nenhuma categoria encontrada.</p>
-                ) : 
-                    <table className="min-w-full bg-white">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th>Nome</th>
-                                <th>Preço</th>
-                                <th>Preço acima de 20 unidades</th>
-                                <th>Preço acima de 50 unidades</th>
-                                <th>Atualizar</th>
-                                <th>Deletar</th>
-                            </tr>
-                        </thead>
-
-                        <tbody className="">
-                            {categories.map((category) => (
-                                <tr key={category.id} className="border-b hover:bg-gray-100">
-                                    <td className="px-4 py-2">{category.name}</td>
-                                    <td className="px-4 py-2">{category.price.toFixed(2)}</td>
-                                    <td className="px-4 py-2">{category.price_above_20_units.toFixed(2)}</td>
-                                    <td className="px-4 py-2">{category.price_above_50_units.toFixed(2)}</td>
-                                    <td className="px-4 py-2">
-                                        <button
-                                            onClick={() => updateCategory(category.id, { 
+                                <div className="mt-4 flex justify-end space-x-2">
+                                    <button
+                                        onClick={() => updateCategory(category.id, { 
                                                 name: "Atualizado " + category.name,
                                                 price: category.price,
                                                 price_above_20_units: category.price_above_20_units,
                                                 price_above_50_units: category.price_above_50_units
                                             })}
-                                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                        >
-                                            Atualizar
-                                        </button>
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        <button
-                                            onClick={() => deleteCategory(category.id)}
-                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                        >
-                                            Deletar
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                }
-            </div>
+                                        className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                        title="Editar categoria"
+                                    >
+                                        <Edit3 className="w-4 h-4" />
+                                    </button>
 
+                                    <button
+                                        onClick={() => deleteCategory(category.id)}
+                                        className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                        title="Deletar categoria"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
