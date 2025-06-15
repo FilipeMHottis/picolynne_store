@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import StorageUtil from "../utils/storageUtil";
 import Navegate from "../components/navegate";
 import { Edit3, Trash2, PlusCircle } from "lucide-react";
-
+import CategoryPopup from "../components/categoryPopup";
 
 interface Response<T> {
     code: number;
@@ -20,23 +20,13 @@ interface Category {
     price_above_50_units: number;
 }
 
-const isCategory = (data: any): data is Category => {
-    return (
-        typeof data === 'object' &&
-        data !== null &&
-        'id' in data && typeof data.id === 'number' &&
-        'name' in data && typeof data.name === 'string' &&
-        'price' in data && typeof data.price === 'number' &&
-        'price_above_20_units' in data && typeof data.price_above_20_units === 'number' &&
-        'price_above_50_units' in data && typeof data.price_above_50_units === 'number'
-    );
-}
-
 function Categories() {
     // Toeken para autenticação
     const token = StorageUtil.getItem("token");
     const URL = BACKEND_URL + "/categories";
     const [categories, setCategories] = useState<Category[]>([]);
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
     
     // Pegar todas as categorias
     const fetchCategories = async () => {
@@ -57,54 +47,6 @@ function Categories() {
         } catch (error) {
             console.error("Erro ao buscar categorias:", error);
         }   
-    }
-
-    // Criar uma categoria
-    const createCategory = async (category: Omit<Category, 'id'>) => {        
-        try {
-            const response = await apiRequest<Response<Category>>({
-                method: "POST",
-                url: URL,
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: category,
-            });
-
-            if (response.code === 201 && isCategory(response.data)) {
-                const data = response.data as Category;
-                setCategories(prevCategories => [...prevCategories, data]);
-            } else {
-                console.error("Erro ao criar categoria:", response.message);
-            }
-        } catch (error) {
-            console.error("Erro ao criar categoria:", error);
-        }
-    }
-
-    // Atualizar uma categoria
-    const updateCategory = async (id: number, category: Partial<Omit<Category, 'id'>>) => {
-        try {
-            const response = await apiRequest<Response<Category>>({
-                method: "PUT",
-                url: `${URL}/${id}`,
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: category,
-            });
-
-            if (response.code === 200 && isCategory(response.data)) {
-                const updatedCategory = response.data as Category;
-                setCategories(prevCategories =>
-                    prevCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat)
-                );
-            } else {
-                console.error("Erro ao atualizar categoria:", response.message);
-            }
-        } catch (error) {
-            console.error("Erro ao atualizar categoria:", error);
-        }
     }
 
     // Deletar uma categoria
@@ -128,6 +70,8 @@ function Categories() {
         }
     }
 
+
+
     // Efeito colateral para buscar categorias ao montar o componente
     useEffect(() => {
         fetchCategories();
@@ -137,6 +81,13 @@ function Categories() {
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
             <Navegate />
 
+            <CategoryPopup
+                isOpen={popupOpen}
+                onClose={() => setPopupOpen(false)}
+                onSuscess={fetchCategories}
+                category={selectedCategory}
+            />
+
             <h1 className="text-4xl font-bold mb-8 text-center">Categorias</h1>
 
             <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8">
@@ -144,9 +95,12 @@ function Categories() {
                     <h2 className="text-2xl font-semibold">Lista de Categorias</h2>
 
                     <button
-                        onClick={() => createCategory({ name: "Nova Categoria", price: 0, price_above_20_units: 0, price_above_50_units: 0 })}
                         className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                         title="Criar nova categoria"
+                        onClick={() => {
+                            setSelectedCategory(undefined);
+                            setPopupOpen(true);
+                        }}
                     >
                         <PlusCircle className="mr-2" />
                         Criar Categoria
@@ -174,14 +128,12 @@ function Categories() {
 
                                 <div className="mt-4 flex justify-end space-x-2">
                                     <button
-                                        onClick={() => updateCategory(category.id, { 
-                                                name: "Atualizado " + category.name,
-                                                price: category.price,
-                                                price_above_20_units: category.price_above_20_units,
-                                                price_above_50_units: category.price_above_50_units
-                                            })}
                                         className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                                         title="Editar categoria"
+                                        onClick={() => {
+                                            setSelectedCategory(category);
+                                            setPopupOpen(true);
+                                        }}
                                     >
                                         <Edit3 className="w-4 h-4" />
                                     </button>
