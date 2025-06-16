@@ -7,7 +7,7 @@ import { Category } from "../types/categoryType";
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onSuscess: () => void;
+    onSuccess: () => void;
     category?: Category; // undefined = criação, definido = edição
 }
 
@@ -22,12 +22,11 @@ const isCategory = (data: any): data is Category => {
         'price_above_50_units' in data && typeof data.price_above_50_units === 'number'
     );
 
-    console.log("Category data is valid:", isTrue);
     return isTrue;
 }
 
 // parametro opcial do tipo Category
-function CategoryPopup({ isOpen, onClose, onSuscess, category }: Props) {
+function CategoryPopup({ isOpen, onClose, onSuccess, category }: Props) {
     const token = StorageUtil.getItem("token");
     const URL = BACKEND_URL + "/categories";
     
@@ -65,61 +64,35 @@ function CategoryPopup({ isOpen, onClose, onSuscess, category }: Props) {
             price_above_50_units: priceAbove50
         };
 
-        if (category) {
-            // Atualizar categoria existente
-            if (!isCategory(categoryData)) {
-                console.error("Dados da categoria inválidos");
-                return;
-            }
-
-            try {
-                const response = await apiRequest<Category>({
-                    method: "PUT",
-                    url: `${URL}/${category.id}`,
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: categoryData
-                });
-
-                if (response.code === 200) {
-                    onSuscess();
-                } else {
-                    console.error("Erro ao atualizar categoria:", response.message);
-                }
-            } catch (error) {
-                console.error("Erro ao atualizar categoria:", error);
-            }      
-        } else {
-            // Criar nova categoria
-            if (!isCategory(categoryData)) {
-                console.error("Dados da categoria inválidos");
-                return;
-            }
-
-            try {
-                const response = await apiRequest<Category>({
-                    method: "POST",
-                    url: URL,
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: categoryData
-                });
-                if (response.code === 201) {
-                    onSuscess();
-                }
-                else {
-                    console.error("Erro ao criar categoria:", response.message);
-                }
-            } catch (error) {
-                console.error("Erro ao criar categoria:", error);
-            }
+        if (!isCategory(categoryData)) {
+            console.error("Dados da categoria inválidos");
+            return;
         }
 
-        onClose();
+        try {
+            const method = category ? "PUT" : "POST";
+            const endpoint = category ? `${URL}/${category.id}` : URL;
+
+            const response = await apiRequest<Category>({
+                method,
+                url: endpoint,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: categoryData,
+            });
+
+            const isSuccess = category ? response.code === 200 : response.code === 201;
+            if (isSuccess) {
+                onSuccess();
+                onClose();
+            } else {
+                console.error("Erro ao salvar a categoria:", response.message);
+            }
+        } catch (error) {
+            console.error("Erro ao fazer a requisição:", error);
+        }
     }
     
     // Renderizar o popup ou nao

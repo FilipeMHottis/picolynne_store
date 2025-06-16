@@ -1,44 +1,40 @@
+import { useEffect, useState } from "react";
 import { apiRequest } from "../utils/apiRequest";
 import { BACKEND_URL } from "../utils/env";
-import { useState, useEffect } from "react";
 import StorageUtil from "../utils/storageUtil";
 import Navegate from "../components/navegate";
 import { Edit3, Trash2, PlusCircle } from "lucide-react";
-import CategoryPopup from "../components/categoryPopup";
-import { Category } from "../types/categoryType";
+import { Tag } from "../types/tagType";
+import TagPopup from "../components/tagPopup"; // vamos criar depois
 
-
-function Categories() {
-    // Toeken para autenticação
+function Tags() {
     const token = StorageUtil.getItem("token");
-    const URL = BACKEND_URL + "/categories";
-    const [categories, setCategories] = useState<Category[]>([]);
+    const URL = BACKEND_URL + "/tags";
+    const [tags, setTags] = useState<Tag[]>([]);
     const [popupOpen, setPopupOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
-    
-    // Pegar todas as categorias
-    const fetchCategories = async () => {
+    const [selectedTag, setSelectedTag] = useState<Tag | undefined>(undefined);
+
+    const fetchTags = async () => {
         try {
-            const response = await apiRequest<Category[]>({
+            const response = await apiRequest<Tag[]>({
                 method: "GET",
                 url: URL,
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                },              
+                },
             });
 
             if (response.code === 200 && Array.isArray(response.data)) {
-                setCategories(response.data);
+                setTags(response.data);
             } else {
-                setCategories([]);
+                setTags([]);
             }
         } catch (error) {
-            console.error("Erro ao buscar categorias:", error);
-        }   
-    }
+            console.error("Erro ao buscar tags:", error);
+        }
+    };
 
-    // Deletar uma categoria
-    const deleteCategory = async (id: number) => {
+    const deleteTag = async (id: number) => {
         try {
             const response = await apiRequest({
                 method: "DELETE",
@@ -49,20 +45,17 @@ function Categories() {
             });
 
             if (response.code === 200) {
-                setCategories(prevCategories => prevCategories.filter(cat => cat.id !== id));
+                setTags(prev => prev.filter(tag => tag.id !== id));
             } else {
-                console.error("Erro ao deletar categoria:", response.message);
+                console.error("Erro ao deletar tag:", response.message);
             }
         } catch (error) {
-            console.error("Erro ao deletar categoria:", error);
+            console.error("Erro ao deletar tag:", error);
         }
-    }
+    };
 
-
-
-    // Efeito colateral para buscar categorias ao montar o componente
     useEffect(() => {
-        fetchCategories();
+        fetchTags();
     }, []);
 
     return (
@@ -77,59 +70,53 @@ function Categories() {
             pb-18
             pt-[calc(1rem+env(safe-area-inset-top))]
         ">
-
             <Navegate />
-            <CategoryPopup
+            <TagPopup
                 isOpen={popupOpen}
                 onClose={() => setPopupOpen(false)}
-                onSuccess={fetchCategories}
-                category={selectedCategory}
+                onSuccess={fetchTags}
+                tag={selectedTag}
             />
 
-            <h1 className="text-4xl font-bold mb-8 text-center">Categorias</h1>
+
+            <h1 className="text-4xl font-bold mb-8 text-center">Tags</h1>
 
             <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold">Lista de Categorias</h2>
+                    <h2 className="text-2xl font-semibold">Lista de Tags</h2>
 
                     <button
                         className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-                        title="Criar nova categoria"
                         onClick={() => {
-                            setSelectedCategory(undefined);
+                            setSelectedTag(undefined);
                             setPopupOpen(true);
                         }}
+                        title="Criar nova tag"
                     >
                         <PlusCircle className="mr-2" />
-                        Criar Categoria
+                        Criar Tag
                     </button>
                 </div>
 
-                {categories.length === 0 ? (
-                    <p className="text-gray-500 text-center">Nenhuma categoria encontrada.</p>
+                {tags.length === 0 ? (
+                    <p className="text-gray-500 text-center">Nenhuma tag encontrada.</p>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {categories.map(category => (
-                            <div 
-                                key={category.id} 
+                        {tags.map(tag => (
+                            <div
+                                key={tag.id}
                                 className="bg-gray-50 p-4 rounded-xl shadow hover:shadow-md transition-shadow flex flex-col justify-between"
                             >
-                                <h3 
-                                    className="text-xl font-bold mb-2 flex items-center gap-2"
-                                >
-                                    📦 {category.name}
+                                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                                    🏷️ {tag.name}
                                 </h3>
-                                
-                                <p className="text-gray-700">💰 Preço: R$ {category.price.toFixed(2)}</p>
-                                <p className="text-gray-700">📦 +20 und: R$ {category.price_above_20_units.toFixed(2)}</p>
-                                <p className="text-gray-700">📦 +50 und: R$ {category.price_above_50_units.toFixed(2)}</p>
 
                                 <div className="mt-4 flex justify-end space-x-2">
                                     <button
                                         className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                        title="Editar categoria"
+                                        title="Editar tag"
                                         onClick={() => {
-                                            setSelectedCategory(category);
+                                            setSelectedTag(tag);
                                             setPopupOpen(true);
                                         }}
                                     >
@@ -137,9 +124,9 @@ function Categories() {
                                     </button>
 
                                     <button
-                                        onClick={() => category.id !== undefined && deleteCategory(category.id)}
+                                        onClick={() => tag.id !== undefined && deleteTag(tag.id)}
                                         className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                        title="Deletar categoria"
+                                        title="Deletar tag"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -153,4 +140,4 @@ function Categories() {
     );
 }
 
-export default Categories;
+export default Tags;
