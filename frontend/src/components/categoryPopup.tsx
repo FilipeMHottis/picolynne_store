@@ -2,20 +2,7 @@ import { apiRequest } from "../utils/apiRequest";
 import { BACKEND_URL } from "../utils/env";
 import { useState, useEffect } from "react";
 import StorageUtil from "../utils/storageUtil";
-
-interface Response<T> {
-    code: number;
-    message: string;
-    data: T;
-}
-
-interface Category {
-    id?: number;
-    name: string;
-    price: number;
-    price_above_20_units: number;
-    price_above_50_units: number;
-}
+import { Category } from "../types/categoryType";
 
 interface Props {
     isOpen: boolean;
@@ -86,7 +73,7 @@ function CategoryPopup({ isOpen, onClose, onSuscess, category }: Props) {
             }
 
             try {
-                const response = await apiRequest<Response<Category>>({
+                const response = await apiRequest<Category>({
                     method: "PUT",
                     url: `${URL}/${category.id}`,
                     headers: {
@@ -112,7 +99,7 @@ function CategoryPopup({ isOpen, onClose, onSuscess, category }: Props) {
             }
 
             try {
-                const response = await apiRequest<Response<Category>>({
+                const response = await apiRequest<Category>({
                     method: "POST",
                     url: URL,
                     headers: {

@@ -1,16 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../utils/apiRequest";
 import { BACKEND_URL } from "../utils/env";
+import { LoginRequest } from "../types/loginType";
 import StorageUtil from "../utils/storageUtil";
 import { FormEvent } from "react";
 import "../animations/shack.css"
 
 const LOGIN_URL = `${BACKEND_URL}/login`;
-
-interface LoginRequest {
-  username: string;
-  password: string;
-}
 
 const login = async (
   username: string,

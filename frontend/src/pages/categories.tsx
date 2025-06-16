@@ -5,20 +5,8 @@ import StorageUtil from "../utils/storageUtil";
 import Navegate from "../components/navegate";
 import { Edit3, Trash2, PlusCircle } from "lucide-react";
 import CategoryPopup from "../components/categoryPopup";
+import { Category } from "../types/categoryType";
 
-interface Response<T> {
-    code: number;
-    message: string;
-    data: T;
-}
-
-interface Category {
-    id: number;
-    name: string;
-    price: number;
-    price_above_20_units: number;
-    price_above_50_units: number;
-}
 
 function Categories() {
     // Toeken para autenticação
@@ -31,7 +19,7 @@ function Categories() {
     // Pegar todas as categorias
     const fetchCategories = async () => {
         try {
-            const response = await apiRequest<Response<Category[]>>({
+            const response = await apiRequest<Category[]>({
                 method: "GET",
                 url: URL,
                 headers: {
@@ -52,7 +40,7 @@ function Categories() {
     // Deletar uma categoria
     const deleteCategory = async (id: number) => {
         try {
-            const response = await apiRequest<Response<null>>({
+            const response = await apiRequest({
                 method: "DELETE",
                 url: `${URL}/${id}`,
                 headers: {
@@ -139,7 +127,7 @@ function Categories() {
                                     </button>
 
                                     <button
-                                        onClick={() => deleteCategory(category.id)}
+                                        onClick={() => category.id !== undefined && deleteCategory(category.id)}
                                         className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                                         title="Deletar categoria"
                                     >
