@@ -60,16 +60,17 @@ function Tags() {
 
     return (
         <div className="
-            flex flex-col 
-            items-center 
-            justify-center 
-            min-h-screen
-            bg-gray-100 
-            overflow-auto 
-            px-4 
-            pb-18
-            pt-[calc(1rem+env(safe-area-inset-top))]
-        ">
+                flex flex-col 
+                items-center 
+                justify-center 
+                min-h-screen
+                bg-gray-100 
+                overflow-auto 
+                px-4 
+                pb-18
+                pt-[calc(1rem+env(safe-area-inset-top))]
+            "
+        >
             <Navegate />
             <TagPopup
                 isOpen={popupOpen}
