@@ -202,7 +202,7 @@ class ProductModel:
 
             new_product = ProductBase(
                 name=product.name,
-                description=product.description,
+                img_link=product.img_link,
                 category_id=category.id,
                 stock=product.stock,
             )
@@ -259,7 +259,7 @@ class ProductModel:
                 raise Exception("Category not found.")
 
             product_to_update.name = product_data.name
-            product_to_update.description = product_data.description
+            product_to_update.img_link = product_data.img_link
             product_to_update.category_id = category.id
             product_to_update.stock = product_data.stock
 

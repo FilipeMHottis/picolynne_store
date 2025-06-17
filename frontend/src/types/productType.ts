@@ -4,7 +4,7 @@ import { Tag } from "./tagType";
 interface Product {
     id?: string;
     name: string;
-    description: string;
+    img_link: string;
     stock: number;
     category: Category;
     tags: Tag[];
@@ -12,7 +12,7 @@ interface Product {
 
 interface ProductRequest {
     name: string;
-    description: string;
+    img_link: string;
     stock: number;
     category_id: number;
     tags_id: number[];
