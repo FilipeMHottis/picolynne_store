@@ -136,7 +136,7 @@ const Stock = () => {
                                             {product.tags.map((tag) => (
                                                 <span
                                                     key={tag.id}
-                                                    className="bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-full"
+                                                    className="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"
                                                 >
                                                     {tag.name}
                                                  </span>
