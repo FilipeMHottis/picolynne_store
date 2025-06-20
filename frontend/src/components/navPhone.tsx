@@ -1,12 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Boxes, Tags, Layers, User } from "lucide-react";
 
 function NavPhone() {
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const baseClasses = "flex flex-col items-center transition-colors";
+  const activeClasses = "text-yellow-400";
+  const inactiveClasses = "text-white hover:text-yellow-400";
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-red-600 shadow-md px-4 py-2 flex justify-between items-center z-50 rounded-t-xl">
       <Link
         to="/"
-        className="flex flex-col items-center text-white hover:text-yellow-400 transition-colors"
+        className={`${baseClasses} ${isActive("/") ? activeClasses : inactiveClasses}`}
       >
         <ShoppingCart size={22} />
         <span className="text-xs mt-1">Vendas</span>
@@ -14,7 +22,7 @@ function NavPhone() {
 
       <Link
         to="/estoque"
-        className="flex flex-col items-center text-white hover:text-yellow-400 transition-colors"
+        className={`${baseClasses} ${isActive("/estoque") ? activeClasses : inactiveClasses}`}
       >
         <Boxes size={22} />
         <span className="text-xs mt-1">Estoque</span>
@@ -22,7 +30,7 @@ function NavPhone() {
 
       <Link
         to="/categorias"
-        className="flex flex-col items-center text-white hover:text-yellow-400 transition-colors"
+        className={`${baseClasses} ${isActive("/categorias") ? activeClasses : inactiveClasses}`}
       >
         <Layers size={22} />
         <span className="text-xs mt-1">Categorias</span>
@@ -30,7 +38,7 @@ function NavPhone() {
 
       <Link
         to="/tags"
-        className="flex flex-col items-center text-white hover:text-yellow-400 transition-colors"
+        className={`${baseClasses} ${isActive("/tags") ? activeClasses : inactiveClasses}`}
       >
         <Tags size={22} />
         <span className="text-xs mt-1">Tags</span>
@@ -38,13 +46,13 @@ function NavPhone() {
 
       <Link
         to="/perfil"
-        className="flex flex-col items-center text-white hover:text-yellow-400 transition-colors"
+        className={`${baseClasses} ${isActive("/perfil") ? activeClasses : inactiveClasses}`}
       >
         <User size={22} />
         <span className="text-xs mt-1">Perfil</span>
       </Link>
     </nav>
-);
+  );
 }
 
 export default NavPhone;
