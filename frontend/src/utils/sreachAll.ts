@@ -36,8 +36,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
                 resultsId.push(responseId.data);
             }
         }
-        catch (error) {
-            console.error("Error fetching product by ID:", error);
+        catch {
         }
 
         // Busca por Nome
@@ -51,8 +50,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
             if (responseName.code === 200 && Array.isArray(responseName.data)) {
                 resultsName.push(...responseName.data);
             }
-        } catch (error) {
-            console.error("Error fetching products by name:", error);
+        } catch {
         }
 
         // Busca por Categoria
@@ -66,8 +64,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
             if (responseCategory.code === 200 && Array.isArray(responseCategory.data)) {
                 resultsCategory.push(...responseCategory.data);
             }
-        } catch (error) {
-            console.error("Error fetching products by category:", error);
+        } catch {
         }
 
         // Busca por Tag
@@ -81,8 +78,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
             if (responseTag.code === 200 && Array.isArray(responseTag.data)) {
                 resultsTag.push(...responseTag.data);
             }
-        } catch (error) {
-            console.error("Error fetching products by tag:", error);
+        } catch {
         }
 
         // Concatena os resultados com prioridade: ID > Nome > Categoria > Tag

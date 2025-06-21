@@ -10,6 +10,7 @@ from ..typings.product_typing import Product, ProductCreate
 from ..typings.category_typing import Category
 from ..typings.tag_typing import Tag
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 
 
 def return_category_and_tags(
@@ -104,7 +105,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.name.ilike(f"%{product_name}%"))
+                .filter(func.lower(ProductBase.name).like(f"%{product_name.lower()}%"))
                 .all()
             )
 
@@ -134,7 +135,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.category.has(name=category_name))
+                .filter(func.lower(ProductBase.category.has().name).like(f"%{category_name.lower()}%"))
                 .all()
             )
 
@@ -162,7 +163,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.tags.any(TagBase.name == tag_name))
+                .filter(ProductBase.tags.any(func.lower(TagBase.name).like(f"%{tag_name.lower()}%")))
                 .all()
             )
 

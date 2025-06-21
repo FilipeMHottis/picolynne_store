@@ -7,6 +7,7 @@ import { apiRequest } from "../utils/apiRequest";
 import StorageUtil from "../utils/storageUtil";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
+import SearchBar from "../components/searchbar";
 
 function Home() {
     const [search, setSearch] = useState("");
@@ -23,10 +24,6 @@ function Home() {
         const result = await searchAll(search.trim());
         setProducts(result);
         setLoading(false);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") handleSearch();
     };
 
     const fetchProducts = async () => {
@@ -60,23 +57,11 @@ function Home() {
         <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 pb-20 pt-6">
             <LoginPopup />
             <Navegate />
-
-            <div className="w-full max-w-md mt-8">
-                <input
-                    type="text"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Buscar produto por ID, nome, categoria ou tag..."
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-                <button
-                    onClick={handleSearch}
-                    className="mt-2 w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-semibold transition"
-                >
-                    Buscar
-                </button>
-            </div>
+            <SearchBar
+                handleSearch={handleSearch}
+                setSearch={setSearch}
+                search={search}
+            />
 
             {loading ? (
                 <p className="mt-8 text-gray-600">Buscando produtos...</p>
