@@ -134,7 +134,7 @@ const Stock = () => {
                     </button>
                 </div>
 
-                {!loading && products.length === 0 ? (
+                { !loading && products.length === 0 ? (
                     <p className="text-gray-500 mt-4 text-center">Nenhum produto encontrado.</p>
                 ) : (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

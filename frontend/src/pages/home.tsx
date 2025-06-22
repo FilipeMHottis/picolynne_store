@@ -59,11 +59,16 @@ function Home() {
         <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 pb-20 pt-6">
             <LoginPopup />
             <Navegate />
-            <SearchBar
-                handleSearch={handleSearch}
-                setSearch={setSearch}
-                search={search}
-            />
+
+            <div className="w-full flex flex-col items-center mb-8 sm:mt-16">
+                <div className="w-full max-w-xl bg-white rounded-xl shadow-md border border-gray-200 pb-4">
+                    <SearchBar
+                        handleSearch={handleSearch}
+                        setSearch={setSearch}
+                        search={search}
+                    />
+                </div>
+            </div>
 
             {loading ? (
                 <p className="mt-8 text-gray-600">Buscando produtos...</p>
