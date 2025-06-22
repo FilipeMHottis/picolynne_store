@@ -98,79 +98,81 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
 
     return (
         <div className="w-full flex flex-col items-center mt-4">
-            {/* Input */}
-            <div className="flex w-full max-w-md">
-                <input
-                    type="text"
-                    value={search}
-                    onChange={e => {
-                        setSearch(e.target.value);
-                        setShowSuggestions(true);
-                    }}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Buscar produto por ID, nome, categoria ou tag..."
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-                <button
-                    onClick={() => handleSearch(search.trim())}
-                    className="ml-2 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold transition"
-                >
-                    <Search className="inline" />
-                </button>
+            <div className="w-full max-w-md relative">
+                {/* Input */}
+                <div className="flex w-full">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => {
+                            setSearch(e.target.value);
+                            setShowSuggestions(true);
+                        }}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Buscar produto por ID, nome, categoria ou tag..."
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    />
+                    <button
+                        onClick={() => handleSearch(search.trim())}
+                        className="ml-2 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold transition"
+                    >
+                        <Search className="inline" />
+                    </button>
+                </div>
+
+                {/* Sugestões */}
+                {search.trim() && showSuggestions &&
+                    (filteredProducts.length > 0 ||
+                        filteredTags.length > 0 ||
+                        filteredCategories.length > 0) && (
+                        <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-md z-10 max-h-60 overflow-y-auto">
+                            {filteredProducts.length > 0 && (
+                                <div>
+                                    <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">📦 Produtos</p>
+                                    {filteredProducts.map((item, i) => (
+                                        <div
+                                            key={`prod-${i}`}
+                                            onClick={() => handleClick(item.original)}
+                                            className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
+                                        >
+                                            {item.original}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {filteredTags.length > 0 && (
+                                <div>
+                                    <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">🏷️ Tags</p>
+                                    {filteredTags.map((name, i) => (
+                                        <div
+                                            key={`tag-${i}`}
+                                            onClick={() => handleClick(name.original)}
+                                            className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
+                                        >
+                                            {name.original}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {filteredCategories.length > 0 && (
+                                <div>
+                                    <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">📂 Categorias</p>
+                                    {filteredCategories.map((name, i) => (
+                                        <div
+                                            key={`cat-${i}`}
+                                            onClick={() => handleClick(name.original)}
+                                            className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
+                                        >
+                                            {name.original}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
             </div>
-
-            {/* Sugestões */}
-            {search.trim() && showSuggestions &&
-                (filteredProducts.length > 0 ||
-                    filteredTags.length > 0 ||
-                    filteredCategories.length > 0) && (
-                    <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-md z-10 max-h-60 overflow-y-auto">
-                        {filteredProducts.length > 0 && (
-                            <div>
-                                <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">📦 Produtos</p>
-                                {filteredProducts.map((item, i) => (
-                                    <div
-                                        key={`prod-${i}`}
-                                        onClick={() => handleClick(item.original)}
-                                        className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
-                                    >
-                                        {item.original}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {filteredTags.length > 0 && (
-                            <div>
-                                <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">🏷️ Tags</p>
-                                {filteredTags.map((name, i) => (
-                                    <div
-                                        key={`tag-${i}`}
-                                        onClick={() => handleClick(name.original)}
-                                        className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
-                                    >
-                                        {name.original}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {filteredCategories.length > 0 && (
-                            <div>
-                                <p className="px-4 pt-3 pb-1 text-sm font-semibold text-gray-600">📂 Categorias</p>
-                                {filteredCategories.map((name, i) => (
-                                    <div
-                                        key={`cat-${i}`}
-                                        onClick={() => handleClick(name.original)}
-                                        className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
-                                    >
-                                        {name.original}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
         </div>
     );
 }
