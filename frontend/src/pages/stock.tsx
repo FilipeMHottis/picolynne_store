@@ -6,13 +6,32 @@ import Navegate from "../components/navegate";
 import { Product } from "../types/productType";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import ProductPopup from "../components/productPopup";
+import SearchBar from "../components/searchbar";
+import searchAll from "../utils/searchAll";
 
 const Stock = () => {
     const token = StorageUtil.getItem("token");
     const URL = BACKEND_URL + "/products";
+    
     const [products, setProducts] = useState<Product[]>([]);
     const [popupOpen, setPopupOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+    const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleSearch = async (query?: string) => {
+        const value = query ?? search;
+
+        if (!value.trim()) {
+            fetchProducts();
+            return;
+        }
+
+        setLoading(true);
+        const result = await searchAll(value.trim());
+        setProducts(result);
+        setLoading(false);
+    };
 
     const fetchProducts = async () => {
         try {
@@ -88,7 +107,16 @@ const Stock = () => {
                 product={selectedProduct}
             />
 
-            <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">Estoque</h1>
+            <div className="w-full flex flex-col items-center mb-8 sm:mt-16">
+                <div className="w-full max-w-xl bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                    <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Estoque</h1>
+                    <SearchBar
+                        handleSearch={handleSearch}
+                        setSearch={setSearch}
+                        search={search}
+                    />
+                </div>
+            </div>
 
             <div className="w-full max-w-6xl bg-white shadow-xl rounded-2xl p-8">
                 <div className="flex items-center justify-between mb-6">
@@ -106,7 +134,7 @@ const Stock = () => {
                     </button>
                 </div>
 
-                {products.length === 0 ? (
+                {!loading && products.length === 0 ? (
                     <p className="text-gray-500 mt-4 text-center">Nenhum produto encontrado.</p>
                 ) : (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,6 +1,6 @@
 import Navegate from "../components/navegate";
 import LoginPopup from "../components/loginPopup";
-import searchAll from "../utils/sreachAll";
+import searchAll from "../utils/searchAll";
 import { Product } from "../types/productType";
 import { BACKEND_URL } from "../utils/env";
 import { apiRequest } from "../utils/apiRequest";

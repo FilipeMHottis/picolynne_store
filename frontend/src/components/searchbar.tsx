@@ -97,9 +97,9 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
     };
 
     return (
-        <div className="w-full max-w-md mt-8 flex flex-col relative">
+        <div className="w-full flex flex-col items-center mt-4">
             {/* Input */}
-            <div className="flex w-full">
+            <div className="flex w-full max-w-md">
                 <input
                     type="text"
                     value={search}
