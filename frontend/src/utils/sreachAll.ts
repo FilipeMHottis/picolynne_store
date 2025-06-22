@@ -19,8 +19,6 @@ const searchAll = async (search: string): Promise<Product[]> => {
             Authorization: `Bearer ${token}`,
         };
 
-        const resultsId: Product[] = [];
-        const resultsName: Product[] = [];
         const resultsCategory: Product[] = [];
         const resultsTag: Product[] = [];
 
@@ -32,9 +30,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
                 headers,
             });
 
-            if (responseId.code === 200 && responseId.data) {
-                resultsId.push(responseId.data);
-            }
+            return [responseId.data];
         }
         catch {
         }
@@ -46,10 +42,7 @@ const searchAll = async (search: string): Promise<Product[]> => {
                 url: `${urlSearchName}${search}`,
                 headers,
             });
-
-            if (responseName.code === 200 && Array.isArray(responseName.data)) {
-                resultsName.push(...responseName.data);
-            }
+            return [...responseName.data];
         } catch {
         }
 
@@ -83,8 +76,6 @@ const searchAll = async (search: string): Promise<Product[]> => {
 
         // Concatena os resultados com prioridade: ID > Nome > Categoria > Tag
         const combined = [
-            ...resultsId,
-            ...resultsName,
             ...resultsCategory,
             ...resultsTag,
         ];

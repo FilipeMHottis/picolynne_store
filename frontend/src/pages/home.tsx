@@ -14,14 +14,16 @@ function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const handleSearch = async () => {
-        if (!search.trim()) {
+    const handleSearch = async (query?: string) => {
+        const value = query ?? search;
+
+        if (!value.trim()) {
             fetchProducts();
             return;
-        } 
-        
+        }
+
         setLoading(true);
-        const result = await searchAll(search.trim());
+        const result = await searchAll(value.trim());
         setProducts(result);
         setLoading(false);
     };

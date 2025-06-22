@@ -20,10 +20,13 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
     const [allTags, setAllTags] = useState<SuggestionItem[]>([]);
     const [allCategories, setAllCategories] = useState<SuggestionItem[]>([]);
     const [allProducts, setAllProducts] = useState<SuggestionItem[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
+            e.preventDefault();
             handleSearch(search.trim());
+            setShowSuggestions(false);
         }
     };
 
@@ -90,6 +93,7 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
     const handleClick = (value: string) => {
         setSearch(value);
         handleSearch(value);
+        setShowSuggestions(false);
     };
 
     return (
@@ -99,7 +103,10 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
                 <input
                     type="text"
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    onChange={e => {
+                        setSearch(e.target.value);
+                        setShowSuggestions(true);
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder="Buscar produto por ID, nome, categoria ou tag..."
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -113,7 +120,7 @@ function SearchBar({ handleSearch, setSearch, search }: Props) {
             </div>
 
             {/* Sugestões */}
-            {search.trim() &&
+            {search.trim() && showSuggestions &&
                 (filteredProducts.length > 0 ||
                     filteredTags.length > 0 ||
                     filteredCategories.length > 0) && (
