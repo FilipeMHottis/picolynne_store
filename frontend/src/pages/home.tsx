@@ -8,7 +8,7 @@ import StorageUtil from "../utils/storageUtil";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/searchbar";
-import { PackageSearch, Boxes, Trash2 } from "lucide-react";
+import { PackageSearch, Boxes } from "lucide-react";
 import { Sale, SaleCreate, SaleItemForCreate } from "../types/saleType";
 import CardPanelPc from "../components/cardPanelPc";
 
@@ -128,7 +128,7 @@ function Home() {
             <Navegate />
 
             {/* Conteúdo principal */}
-            <main className="w-full max-w-7xl flex flex-col sm:flex-row sm:mr-80">
+            <main className="w-full max-w-8xl flex flex-col md:flex-row pr-0 md:pr-80 transition-all duration-300">
 
                 {/* Coluna da esquerda com barra de pesquisa + produtos */}
                 <section className="flex-1 flex flex-col">
@@ -152,7 +152,7 @@ function Home() {
                             <h2 className="text-xl font-semibold">Produtos disponíveis</h2>
                         </div>
 
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4">
                             {loading ? (
                                 <div className="col-span-full flex items-center gap-2 text-gray-600">
                                     <PackageSearch className="w-5 h-5 animate-pulse" />
