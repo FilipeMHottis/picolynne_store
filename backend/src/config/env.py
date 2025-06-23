@@ -18,7 +18,7 @@ security = {
     "ACCESS_TOKEN_EXPIRE_MINUTES": int(
         os.getenv(
             "ACCESS_TOKEN_EXPIRE_MINUTES",
-            30,
+            1440,
         )
     ),
     "ADMIN_USER": os.getenv("ADMIN_USER", "admin"),
