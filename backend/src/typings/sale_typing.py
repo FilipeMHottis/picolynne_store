@@ -22,7 +22,7 @@ class SaleItemForCreate(TypedDict):
 class Sale(BaseModel):
     id: Optional[int]
     customer: CustomerSale
-    itens: List[SaleItem]
+    items: List[SaleItem]
     total_quantity: int
     total_price: float
 

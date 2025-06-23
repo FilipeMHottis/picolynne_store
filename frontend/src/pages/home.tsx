@@ -8,12 +8,78 @@ import StorageUtil from "../utils/storageUtil";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/searchbar";
-import { ShoppingCart, PackageSearch, Boxes } from "lucide-react";
+import { PackageSearch, Boxes, Trash2 } from "lucide-react";
+import { Sale, SaleCreate, SaleItemForCreate } from "../types/saleType";
+import CardPanelPc from "../components/cardPanelPc";
 
 function Home() {
+    const token = StorageUtil.getItem("token");
+    
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const [selectedItems, setSelectedItems] = useState<SaleItemForCreate[]>([]);
+    const [preview, setPreview] = useState<Sale | null>(null);
+
+    const handleRemoveFromCart = (productId: string) => {
+        const updatedItems = selectedItems.filter(item => item.product_id !== productId);
+        setSelectedItems(updatedItems);
+        updatePreview(updatedItems);
+    };
+
+    const handleQuantityChange = (productId: string, quantity: number) => {
+        const updatedItems = selectedItems.map(item =>
+            item.product_id === productId ? { ...item, quantity: quantity > 0 ? quantity : 1 } : item
+        );
+        setSelectedItems(updatedItems);
+        updatePreview(updatedItems);
+    };
+
+    const updatePreview = async (items: SaleItemForCreate[]) => {
+        try {
+            const headers = {
+                Authorization:  `Bearer ${token}`,
+            };
+
+            const body: SaleCreate = {
+                customer_id: "1", 
+                items,
+            };
+
+            const response = await apiRequest<Sale>({
+                method: "POST",
+                url: `${BACKEND_URL}/sales/preview`,
+                body,
+                headers,
+            });
+
+            console.log("Response from preview:", response);
+
+            if (response.code === 200 && response.data) {
+                setPreview(response.data);
+            } else {
+                console.error("Erro ao gerar preview:", response.message);
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar preview:", error);
+        }
+    };
+
+    const handleAddToCart = (productId: string) => {
+        const updatedItems = [...selectedItems];
+        const existing = updatedItems.find(item => item.product_id === productId);
+
+        console.log("Adding product to cart:", productId);
+
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            updatedItems.push({ product_id: productId, quantity: 1 });
+        }
+
+        setSelectedItems(updatedItems);
+        updatePreview(updatedItems);
+    };
 
     const handleSearch = async (query?: string) => {
         const value = query ?? search;
@@ -94,7 +160,11 @@ function Home() {
                                 </div>
                             ) : products.length > 0 ? (
                                 products.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard 
+                                        key={product.id ?? ""} 
+                                        product={product} 
+                                        onBuy={() => handleAddToCart(product.id ?? "")} 
+                                    />
                                 ))
                             ) : (
                                 <p className="text-gray-500 mt-4 text-center col-span-full">
@@ -102,37 +172,17 @@ function Home() {
                                 </p>
                             )}
                         </div>
+
+                        {/* Painel Lateral */}
+                        <CardPanelPc
+                            preview={preview}
+                            selectedItems={selectedItems}
+                            products={products}
+                            handleRemoveFromCart={handleRemoveFromCart}
+                            handleQuantityChange={handleQuantityChange}
+                        />
                     </div>
                 </section>
-
-                {/* Painel lateral do carrinho */}
-                <aside className="hidden sm:flex fixed top-0 right-0 w-80 h-full bg-white border-l border-gray-300 shadow-xl z-50 flex-col">
-                    <div className="p-4 border-b flex items-center gap-2">
-                        <ShoppingCart className="w-5 h-5" />
-                        <h2 className="text-xl font-bold">Carrinho</h2>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                        <div className="flex justify-between items-center text-sm border-b pb-2">
-                            <span>Produto A x2</span>
-                            <span className="font-medium">R$ 10,00</span>
-                        </div>
-                        <p className="text-sm text-gray-500">Nenhum item selecionado.</p>
-                    </div>
-
-                    <div className="border-t p-4 bg-white">
-                        <div className="flex justify-between items-center text-lg font-bold mb-4">
-                            <span>Total:</span>
-                            <span>R$ 0,00</span>
-                        </div>
-                        <button
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700 transition"
-                            onClick={() => alert("Ir para pagamento")}
-                        >
-                            Ir para o pagamento
-                        </button>
-                    </div>
-                </aside>
             </main>
         </div>
     );

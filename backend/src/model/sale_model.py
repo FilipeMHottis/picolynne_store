@@ -97,7 +97,7 @@ class SaleModel:
 
                 sale_dict = sale.__dict__.copy()
                 sale_dict["customer"] = customer
-                sale_dict["itens"] = items_dict
+                sale_dict["items"] = items_dict
                 returned_sales.append(Sale.model_validate(sale_dict))
 
             return returned_sales
@@ -140,7 +140,7 @@ class SaleModel:
 
             sale_dict = result.__dict__.copy()
             sale_dict["customer"] = customer
-            sale_dict["itens"] = items_dict
+            sale_dict["items"] = items_dict
 
             return Sale.model_validate(sale_dict)
 
@@ -212,7 +212,7 @@ class SaleModel:
 
             sale_dict = new_sale.__dict__.copy()
             sale_dict["customer"] = customer
-            sale_dict["itens"] = items
+            sale_dict["items"] = items
 
             return Sale.model_validate(sale_dict)
 
@@ -280,7 +280,7 @@ class SaleModel:
         sale_preview = Sale(
             id=None,
             customer=customer,
-            itens=items,
+            items=items,
             total_quantity=total_quantity_for_price,
             total_price=total_price,
         )
