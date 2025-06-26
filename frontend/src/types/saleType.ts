@@ -33,4 +33,5 @@ export type {
     SaleItemForCreate,
     SaleCreate,
     CustomerSale,
+    SaleType,
  };

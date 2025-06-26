@@ -10,7 +10,9 @@ import { useEffect, useState } from "react";
 import SearchBar from "../components/searchbar";
 import { PackageSearch, Boxes } from "lucide-react";
 import { Sale, SaleCreate, SaleItemForCreate } from "../types/saleType";
-import CardPanelPc from "../components/cardPanelPc";
+import CartPanelPc from "../components/cartPanelPc";
+import CartPanelMobile from "../components/cartPanelMobile";
+import CartButton from "../components/cartButton";
 
 function Home() {
     const token = StorageUtil.getItem("token");
@@ -20,6 +22,7 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const [selectedItems, setSelectedItems] = useState<SaleItemForCreate[]>([]);
     const [preview, setPreview] = useState<Sale | null>(null);
+    const [cartOpen, setCartOpen] = useState(false);
 
     const handleRemoveFromCart = (productId: string) => {
         const updatedItems = selectedItems.filter(item => item.product_id !== productId);
@@ -173,8 +176,25 @@ function Home() {
                             )}
                         </div>
 
-                        {/* Painel Lateral */}
-                        <CardPanelPc
+                        {/* Cart Panel */}
+                        <CartButton
+                            preview={preview}
+                            onClick={() => setCartOpen(!cartOpen)}
+                        />
+
+                        { cartOpen && (
+                            <CartPanelMobile
+                                preview={preview}
+                                selectedItems={selectedItems}
+                                products={products}
+                                handleRemoveFromCart={handleRemoveFromCart}
+                                handleQuantityChange={handleQuantityChange}
+                                onClose={() => setCartOpen(false)}
+                            />
+                        )}
+
+                        {/* Painel do carrinho para desktop */}
+                        <CartPanelPc
                             preview={preview}
                             selectedItems={selectedItems}
                             products={products}
