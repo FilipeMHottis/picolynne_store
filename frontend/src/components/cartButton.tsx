@@ -7,8 +7,6 @@ interface CartButtonProps {
 }
 
 function CartButton({ onClick, preview }: CartButtonProps) {
-    console.log(preview)
-
     return (
         <button
             className="flex flex-col items-center fixed top-4 right-4 bg-yellow-400 hover:bg-yellow-500 text-white p-3 rounded-full shadow-xl sm:hidden z-50"

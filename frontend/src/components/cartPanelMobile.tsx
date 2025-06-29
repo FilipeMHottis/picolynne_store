@@ -3,6 +3,7 @@ import CartFooter from "./cartFooter";
 import { Sale, SaleItemForCreate } from "../types/saleType";
 import { Product } from "../types/productType";
 import { useEffect } from "react";
+import { Customer } from "../types/customerType";
 
 interface CartPanelProps {
     preview: Sale | null;
@@ -11,6 +12,10 @@ interface CartPanelProps {
     handleRemoveFromCart: (productId: string) => void;
     handleQuantityChange: (productId: string, quantity: number) => void;
     onClose: () => void;
+    setCustomerId: (customerId: string) => void;
+    customerList: Customer[];
+    customerId: string;
+    onClickBuy: () => void;
 }
 
 function CartPanelMobile({
@@ -19,7 +24,11 @@ function CartPanelMobile({
     products,
     handleRemoveFromCart,
     handleQuantityChange,
-    onClose
+    onClose,
+    setCustomerId,
+    customerList,
+    customerId,
+    onClickBuy
 }: CartPanelProps) {
     useEffect(() => {
         document.body.style.overflow = "hidden";
@@ -88,6 +97,10 @@ function CartPanelMobile({
                 {/* Rodapé */}
                 <CartFooter
                     preview={preview}
+                    setCustomerId={setCustomerId}
+                    customerList={customerList}
+                    customerId={customerId}
+                    onClickBuy={onClickBuy}
                 />
             </div>
         </div>

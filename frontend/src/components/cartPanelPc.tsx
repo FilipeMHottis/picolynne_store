@@ -2,6 +2,7 @@ import { Sale, SaleItemForCreate } from "../types/saleType";
 import { Product } from "../types/productType";
 import CartItemCard from "./cartItemCard";
 import CartFooter from "./cartFooter";
+import { Customer } from "../types/customerType";
 
 interface CartPanelProps {
     preview: Sale | null;
@@ -9,6 +10,10 @@ interface CartPanelProps {
     products: Product[];
     handleRemoveFromCart: (productId: string) => void;
     handleQuantityChange: (productId: string, quantity: number) => void;
+    setCustomerId: (customerId: string) => void;
+    customerList: Customer[];
+    customerId: string;
+    onClickBuy: () => void;
 }
 
 
@@ -18,6 +23,10 @@ function CartPanelPc({
     products,
     handleRemoveFromCart,
     handleQuantityChange,
+    setCustomerId,
+    customerList,
+    customerId,
+    onClickBuy
 }: CartPanelProps) {
     return (
         <aside className="hidden sm:flex fixed top-0 right-0 w-80 h-full bg-white border-l border-gray-200 shadow-2xl z-50 flex-col rounded-l-2xl overflow-hidden">
@@ -61,7 +70,13 @@ function CartPanelPc({
             </div>
 
             {/* Rodapé */}
-            <CartFooter preview={preview} />
+            <CartFooter 
+                preview={preview}
+                setCustomerId={setCustomerId}
+                customerList={customerList}
+                customerId={customerId}
+                onClickBuy={onClickBuy}
+            />
         </aside>
     );
 }

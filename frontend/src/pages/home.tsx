@@ -13,6 +13,7 @@ import { Sale, SaleCreate, SaleItemForCreate } from "../types/saleType";
 import CartPanelPc from "../components/cartPanelPc";
 import CartPanelMobile from "../components/cartPanelMobile";
 import CartButton from "../components/cartButton";
+import { Customer } from "../types/customerType";
 
 function Home() {
     const token = StorageUtil.getItem("token");
@@ -23,6 +24,28 @@ function Home() {
     const [selectedItems, setSelectedItems] = useState<SaleItemForCreate[]>([]);
     const [preview, setPreview] = useState<Sale | null>(null);
     const [cartOpen, setCartOpen] = useState(false);
+    const [customerId, setCustomerId] = useState<string>("1");
+    const [customerList, setCustomerList] = useState<Customer[]>([]);
+
+    const fetchCustomers = async () => {
+        try {
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+            const response = await apiRequest<Customer[]>({
+                method: "GET",
+                url: `${BACKEND_URL}/customers`,
+                headers,
+            });
+            if (response.code === 200 && Array.isArray(response.data)) {
+                setCustomerList(response.data);
+            } else {
+                console.error("Failed to fetch customers:", response.message);
+            }
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+        }
+    };
 
     const handleRemoveFromCart = (productId: string) => {
         const updatedItems = selectedItems.filter(item => item.product_id !== productId);
@@ -45,7 +68,7 @@ function Home() {
             };
 
             const body: SaleCreate = {
-                customer_id: "1", 
+                customer_id: customerId, 
                 items,
             };
 
@@ -121,8 +144,46 @@ function Home() {
         }
     };
 
+    const onClickBuy = async () => {
+        if (!preview || !preview.items.length) {
+            alert("Adicione produtos ao carrinho antes de finalizar a compra.");
+            return;
+        }
+
+        try {
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+            const body: SaleCreate = {
+                customer_id: customerId,
+                items: selectedItems,
+            };
+
+            const response = await apiRequest<Sale>({
+                method: "POST",
+                url: `${BACKEND_URL}/sales`,
+                body,
+                headers,
+            });
+
+            console.log("Response from purchase:", response);
+
+            if (response.code === 201 && response.data) {
+                alert("Compra realizada com sucesso!");
+                setSelectedItems([]);
+                setPreview(null);
+                setCartOpen(false);
+            } else {
+                console.error("Erro ao finalizar compra:", response.message);
+            }
+        } catch (error) {
+            console.error("Erro ao finalizar compra:", error);
+        }
+    };
+
     useEffect(() => {
         fetchProducts();
+        fetchCustomers();
     }, []);
 
     return (
@@ -190,6 +251,10 @@ function Home() {
                                 handleRemoveFromCart={handleRemoveFromCart}
                                 handleQuantityChange={handleQuantityChange}
                                 onClose={() => setCartOpen(false)}
+                                customerList={customerList}
+                                setCustomerId={setCustomerId}
+                                customerId={customerId}
+                                onClickBuy={onClickBuy}
                             />
                         )}
 
@@ -200,6 +265,10 @@ function Home() {
                             products={products}
                             handleRemoveFromCart={handleRemoveFromCart}
                             handleQuantityChange={handleQuantityChange}
+                            customerList={customerList}
+                            setCustomerId={setCustomerId}
+                            customerId={customerId}
+                            onClickBuy={onClickBuy}
                         />
                     </div>
                 </section>
