@@ -79,8 +79,6 @@ function Home() {
                 headers,
             });
 
-            console.log("Response from preview:", response);
-
             if (response.code === 200 && response.data) {
                 setPreview(response.data);
             } else {
@@ -94,8 +92,6 @@ function Home() {
     const handleAddToCart = (productId: string) => {
         const updatedItems = [...selectedItems];
         const existing = updatedItems.find(item => item.product_id === productId);
-
-        console.log("Adding product to cart:", productId);
 
         if (existing) {
             existing.quantity += 1;
@@ -166,13 +162,12 @@ function Home() {
                 headers,
             });
 
-            console.log("Response from purchase:", response);
-
             if (response.code === 201 && response.data) {
                 alert("Compra realizada com sucesso!");
                 setSelectedItems([]);
                 setPreview(null);
                 setCartOpen(false);
+                fetchProducts();
             } else {
                 console.error("Erro ao finalizar compra:", response.message);
             }

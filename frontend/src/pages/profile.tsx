@@ -8,6 +8,7 @@ import ProfilePopup from "../components/profilePopup";
 import { useNavigate } from "react-router-dom";
 import FormProfile from "../components/formProfile";
 import CostumersPanel from "../components/customerPanel";
+import SaleHistory from "../components/saleHistory";
 import { 
     UserIcon,
     ShoppingBagIcon,
@@ -47,6 +48,8 @@ function Profile() {
                 );
             case "clientes":
                 return <CostumersPanel />;
+            case "vendas":
+                return <SaleHistory />;
             default:
                 return <div className="text-gray-500">Pagina não funcioal!</div>;
         }

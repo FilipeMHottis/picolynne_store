@@ -26,7 +26,8 @@ def product_return(
     if product is None:
         raise Exception(f"Product {product_id} not found.")
 
-    if product.stock < quantity:
+    # Só checa o estoque se for para atualizar o estoque
+    if update_stock and product.stock < quantity:
         raise Exception(f"Product {product_id} out of stock.")
 
     if update_stock:
@@ -90,7 +91,7 @@ class SaleModel:
                         item["product_id"],
                         item["quantity"],
                         sale.total_quantity,
-                        update_stock=False,
+                        update_stock=False,  # <- Aqui você já tentou evitar mexer no estoque
                     )
                     for item in items_dict
                 ]
