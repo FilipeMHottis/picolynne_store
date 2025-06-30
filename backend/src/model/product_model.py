@@ -10,6 +10,7 @@ from ..typings.product_typing import Product, ProductCreate
 from ..typings.category_typing import Category
 from ..typings.tag_typing import Tag
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 
 
 def return_category_and_tags(
@@ -104,7 +105,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.name.ilike(f"%{product_name}%"))
+                .filter(func.lower(ProductBase.name).like(f"%{product_name.lower()}%"))
                 .all()
             )
 
@@ -134,7 +135,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.category.has(name=category_name))
+                .filter(func.lower(ProductBase.category.has().name).like(f"%{category_name.lower()}%"))
                 .all()
             )
 
@@ -162,7 +163,7 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.tags.any(TagBase.name == tag_name))
+                .filter(ProductBase.tags.any(func.lower(TagBase.name).like(f"%{tag_name.lower()}%")))
                 .all()
             )
 
@@ -202,7 +203,7 @@ class ProductModel:
 
             new_product = ProductBase(
                 name=product.name,
-                description=product.description,
+                img_link=product.img_link,
                 category_id=category.id,
                 stock=product.stock,
             )
@@ -259,7 +260,7 @@ class ProductModel:
                 raise Exception("Category not found.")
 
             product_to_update.name = product_data.name
-            product_to_update.description = product_data.description
+            product_to_update.img_link = product_data.img_link
             product_to_update.category_id = category.id
             product_to_update.stock = product_data.stock
 

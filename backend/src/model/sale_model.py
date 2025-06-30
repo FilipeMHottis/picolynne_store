@@ -26,7 +26,8 @@ def product_return(
     if product is None:
         raise Exception(f"Product {product_id} not found.")
 
-    if product.stock < quantity:
+    # Só checa o estoque se for para atualizar o estoque
+    if update_stock and product.stock < quantity:
         raise Exception(f"Product {product_id} out of stock.")
 
     if update_stock:
@@ -90,14 +91,14 @@ class SaleModel:
                         item["product_id"],
                         item["quantity"],
                         sale.total_quantity,
-                        update_stock=False,
+                        update_stock=False,  # <- Aqui você já tentou evitar mexer no estoque
                     )
                     for item in items_dict
                 ]
 
                 sale_dict = sale.__dict__.copy()
                 sale_dict["customer"] = customer
-                sale_dict["itens"] = items_dict
+                sale_dict["items"] = items_dict
                 returned_sales.append(Sale.model_validate(sale_dict))
 
             return returned_sales
@@ -140,7 +141,7 @@ class SaleModel:
 
             sale_dict = result.__dict__.copy()
             sale_dict["customer"] = customer
-            sale_dict["itens"] = items_dict
+            sale_dict["items"] = items_dict
 
             return Sale.model_validate(sale_dict)
 
@@ -212,7 +213,7 @@ class SaleModel:
 
             sale_dict = new_sale.__dict__.copy()
             sale_dict["customer"] = customer
-            sale_dict["itens"] = items
+            sale_dict["items"] = items
 
             return Sale.model_validate(sale_dict)
 
@@ -280,7 +281,7 @@ class SaleModel:
         sale_preview = Sale(
             id=None,
             customer=customer,
-            itens=items,
+            items=items,
             total_quantity=total_quantity_for_price,
             total_price=total_price,
         )

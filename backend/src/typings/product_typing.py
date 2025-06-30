@@ -7,7 +7,7 @@ from .tag_typing import Tag
 class Product(BaseModel):
     id: Optional[int] = None
     name: str
-    description: str
+    img_link: str
     category: Category
     stock: Optional[int] = 0  # Correção aqui
     tags: List[Tag] = []
@@ -19,7 +19,7 @@ class Product(BaseModel):
 
 class ProductCreate(BaseModel):
     name: str
-    description: str
+    img_link: str
     stock: int = 0
     category_id: int
     tags_id: List[int] = []

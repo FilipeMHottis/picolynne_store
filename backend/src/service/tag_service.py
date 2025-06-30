@@ -128,12 +128,12 @@ class TagService:
         """
         try:
             deleted_tag = self.tag_model.delete_tag(tag_id)
-            if deleted_tag:
-                return Response(
-                    code=200,
-                    message="Tag deleted successfully.",
-                    data=deleted_tag,
-                )
+            return Response(
+                code=200,
+                message="Tag deleted successfully.",
+                data=deleted_tag,
+            )
+        except KeyError:
             return Response(
                 code=404,
                 message="Tag not found for deletion.",
