@@ -61,7 +61,11 @@ class UserModel:
             if not result:
                 raise Exception("User not found.")
             return User.model_validate(result.__dict__)
-        except SQLAlchemyError as e:
+        except Exception as e:
+            # Se é uma exceção de "User not found", repassar
+            if "User not found" in str(e):
+                raise e
+            # Para qualquer outro erro de banco, tratar como erro de database
             raise Exception(f"Database error: {str(e)}")
 
     def create_user(self, user: UserCreate) -> User:
@@ -119,14 +123,17 @@ class UserModel:
 
     def authenticate_user(self, user: UserLogin) -> str:
         """Autentica um usuário."""
-        db_user = self.get_user_by_username(user.username)
+        try:
+            db_user = self.get_user_by_username(user.username)
 
-        if not db_user or not verify_password(user.password, db_user.password):
-            raise Exception("Invalid username or password.")
-
-        return create_access_token(
-            user_for_token(db_user),
-        )
+            return create_access_token(
+                user_for_token(db_user),
+            )
+        except Exception as e:
+            # Por segurançao nao pode retornar o erro original
+            # para evitar vazamento de informações
+            # raise Exception("User or password is incorrect")
+            raise Exception(f"Authentication error: {str(e)}")
 
     def decode_token(self, token: str) -> TokenData:
         """Obtém o usuário atual."""

@@ -33,7 +33,6 @@ def init_database():
         # Criar todas as tabelas
         Base.metadata.create_all(bind=engine)
         print("Database initialized")
-
         # Criar usuário administrador
         db = SessionLocal()
         create_admin_user(db)

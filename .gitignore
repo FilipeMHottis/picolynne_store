@@ -30,3 +30,6 @@ build/
 # Bancos de dados SQLite
 *.sqlite3
 *.db
+
+# Arquivos Env
+.env

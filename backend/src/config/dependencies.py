@@ -6,6 +6,8 @@ from .env import database
 # Configuração do banco de dados
 if database["START_DEV"]:
     SQLALCHEMY_DATABASE_URL = "sqlite:///./picolynne_store_dev.db"
+    # SQLite específico connect_args
+    connect_args = {"check_same_thread": False}
 else:
     SQLALCHEMY_DATABASE_URL = (
         f"postgresql://{database['DB_USER']}:"
@@ -14,11 +16,11 @@ else:
         f"{database['DB_PORT']}/"
         f"{database['DB_NAME']}"
     )
+    # PostgreSQL não precisa de connect_args específicos
+    connect_args = {}
 
 # Criação da engine do banco de dados
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=connect_args)
 
 # Sessão de banco
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
