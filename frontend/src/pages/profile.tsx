@@ -1,13 +1,7 @@
-import { useState, useEffect } from "react";
-import { User } from "../types/user";
-import { apiRequest } from "../utils/apiRequest";
-import { BACKEND_URL } from "../utils/env";
-import StorageUtil from "../utils/storageUtil";
+import { useState } from "react";
 import Navegate from "../components/navegate";
-import ProfilePopup from "../components/profilePopup";
-import { useNavigate } from "react-router-dom";
 import FormProfile from "../components/formProfile";
-import CostumersPanel from "../components/customerPanel";
+import CustomersPanel from "../components/customerPanel";
 import SaleHistory from "../components/saleHistory";
 import { 
     UserIcon,
@@ -16,17 +10,7 @@ import {
     StoreIcon,
 } from "lucide-react";
 
-function Profile() {
-    const token = StorageUtil.getItem("token");
-    const storedUser = StorageUtil.getItem("user");
-    const username = storedUser?.username;
-    const URL = BACKEND_URL + "/users";
-    const navigate = useNavigate();
-    
-    const [user, setUser] = useState<User | undefined>(undefined);
-    const [formData, setFormData] = useState<Partial<User>>({});
-    const [popupOpen, setPopupOpen] = useState(false);
-    const [updateSuccess, setUpdateSuccess] = useState(false);
+function Profile() {  
     const [pageContent, setPageContent] = useState("perfil");
 
     const handlePageChange = (page: string) => {
@@ -37,122 +21,59 @@ function Profile() {
         switch (pageContent) {
             case "perfil":
                 return (
-                    <FormProfile
-                        user={user} 
-                        setUser={setUser}
-                        formData={formData}
-                        setFormData={setFormData}
-                        setPopupOpen={setPopupOpen}
-                        setUpdateSuccess={setUpdateSuccess}
-                    />
+                    <FormProfile />
                 );
             case "clientes":
-                return <CostumersPanel />;
+                return <CustomersPanel />;
             case "vendas":
                 return <SaleHistory />;
             default:
-                return <div className="text-gray-500">Pagina não funcioal!</div>;
+                return <div className="text-center text-blue-600 font-medium">Página ainda não disponível.</div>;
         }
     }
-
-    
-    const handleClosePopup = () => {
-        setPopupOpen(false);
-        StorageUtil.clear(); 
-        navigate("/login");
-    };
-
-    const fetchProfile = async () => {
-        try {
-            const response = await apiRequest<User>({
-                method: "GET",
-                url: `${URL}/username/${username}`,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setUser(response.data);
-            setFormData({ ...response.data, password: "" }); // não mostra senha
-        } catch (error) {
-            console.error("Erro ao buscar perfil do usuário:", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchProfile();
-    }, []);
 
     return (
         <div className="
             flex flex-col 
             items-center 
-            justify-center 
-            min-h-screen
+             min-h-screen
             bg-gradient-to-br from-blue-50 to-white 
             overflow-auto 
             px-4 
             pb-18
-            pt-[calc(1rem+env(safe-area-inset-top))]
-        ">
+            pt-[calc(1rem+env(safe-area-inset-top))]"
+        >
+            
             <Navegate />
-            <ProfilePopup
-                open={popupOpen}
-                success={updateSuccess}
-                onClose={handleClosePopup}
-            />
 
-            <nav className="flex gap-4 mb-8 flex-wrap justify-center">
-                <button
-                    onClick={() => handlePageChange("perfil")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm transition-all duration-200
-                        ${pageContent === "perfil"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"}
-                    `}
-                >
-                    <UserIcon className="w-5 h-5" />
-                    Perfil
-                </button>
+            <div className="relative sm:fixed sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:z-40 bg-white/90 backdrop-blur-md border border-blue-100 rounded-2xl shadow-lg px-2 sm:px-4 pt-2 pb-3 w-full sm:w-auto mt-2">
+                <nav className="flex flex-wrap justify-center gap-2">
+                    {[
+                        { key: "perfil", label: "Perfil", icon: <UserIcon className="w-5 h-5" /> },
+                        { key: "clientes", label: "Clientes", icon: <ShoppingBagIcon className="w-5 h-5" /> },
+                        { key: "vendas", label: "Vendas", icon: <ShoppingCartIcon className="w-5 h-5" /> },
+                        { key: "novos-perfis", label: "Novos Perfis", icon: <StoreIcon className="w-5 h-5" /> },
+                    ].map(({ key, label, icon }) => (
+                        <button
+                            key={key}
+                            onClick={() => handlePageChange(key)}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-2xl shadow-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+                                ${pageContent === key
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"}
+                            `}
+                        >
+                            {icon}
+                            <span className="font-semibold">{label}</span>
+                        </button>
+                    ))}
+                </nav>
+            </div>
 
-                <button
-                    onClick={() => handlePageChange("clientes")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm transition-all duration-200
-                        ${pageContent === "clientes"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"}
-                    `}
-                >
-                    <ShoppingBagIcon className="w-5 h-5" />
-                    Clientes
-                </button>
-
-                <button
-                    onClick={() => handlePageChange("vendas")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm transition-all duration-200
-                        ${pageContent === "vendas"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"}
-                    `}
-                >
-                    <ShoppingCartIcon className="w-5 h-5" />
-                    Vendas
-                </button>
-
-                <button
-                    onClick={() => handlePageChange("novos-perfis")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm transition-all duration-200
-                        ${pageContent === "novos-perfis"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"}
-                    `}
-                >
-                    <StoreIcon className="w-5 h-5" />
-                    Novos Perfis
-                </button>
-            </nav>
-
-
-            {renderPageContent()}
+            <div className="pt-4 sm:pt-36 pb-20 sm:pb-24 px-2 sm:px-4 overflow-y-auto h-full w-full">
+                {renderPageContent()}
+            </div>
         </div>
     );
 }

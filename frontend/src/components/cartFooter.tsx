@@ -54,7 +54,6 @@ function CartFooter({
             <button
                 className="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-xl transition font-semibold shadow-sm"
                 onClick={() => onClickBuy()}
-                disabled={!preview || !preview.items.length}
             >
                 Ir para o pagamento
             </button>

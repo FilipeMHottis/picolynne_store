@@ -47,7 +47,7 @@ function CustomersPanel() {
     };
 
     return (
-        <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
+        <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">👥 Clientes Cadastrados</h2>
                 <button

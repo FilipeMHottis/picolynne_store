@@ -8,16 +8,22 @@ import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import ProductPopup from "../components/productPopup";
 import SearchBar from "../components/searchbar";
 import searchAll from "../utils/searchAll";
+import UniversalPopup from "../components/universalPopup";
 
 const Stock = () => {
     const token = StorageUtil.getItem("token");
     const URL = BACKEND_URL + "/products";
     
     const [products, setProducts] = useState<Product[]>([]);
-    const [popupOpen, setPopupOpen] = useState(false);
+    const [popupTitle, setPopupTitle] = useState("");
+    const [popupMessage, setPopupMessage] = useState("");
+    const [popupConfirmAction, setPopupConfirmAction] = useState<(() => void) | null>(null);
+    const [popupDoubleButton, setPopupDoubleButton] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
+    const [productPopupOpen, setProductPopupOpen] = useState(false); // Para ProductPopup
+    const [universalPopupOpen, setUniversalPopupOpen] = useState(false); // Para UniversalPopup
 
     const handleSearch = async (query?: string) => {
         const value = query ?? search;
@@ -53,27 +59,47 @@ const Stock = () => {
         }
     }
 
-    const handleDelete = async (id: string) => {
-        const confirm = window.confirm("Tem certeza que deseja apagar este produto?");
-        if (!confirm) return;
+    function showPopup({ title, message, onConfirm, doubleButton = false }: { title: string, message: string, onConfirm?: () => void, doubleButton?: boolean }) {
+        setPopupTitle(title);
+        setPopupMessage(message);
+        setPopupConfirmAction(() => onConfirm || null);
+        setPopupDoubleButton(doubleButton);
+        setUniversalPopupOpen(true);
+    }
 
-        try {
-            const response = await apiRequest({
-                method: "DELETE",
-                url: `${URL}/${id}`,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+    const handleDelete = (id: string) => {
+        showPopup({
+            title: "Apagar produto",
+            message: "Tem certeza que deseja apagar este produto?",
+            doubleButton: true,
+            onConfirm: async () => {
+                setUniversalPopupOpen(false);
+            
+                try {
+                    const response = await apiRequest({
+                        method: "DELETE",
+                        url: `${URL}/${id}`,
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
 
-            if (response.code === 200) {
-                fetchProducts();
-            } else {
-                console.error("Erro ao deletar produto:", response.message);
-            }
-        } catch (error) {
-            console.error("Erro ao deletar produto:", error);
-        }
+                    if (response.code === 200) {
+                        fetchProducts();
+                    } else {
+                        showPopup({
+                            title: "Erro",
+                            message: response.message || "Erro ao deletar produto.",
+                        });
+                    }
+                } catch (error) {
+                    showPopup({
+                        title: "Erro",
+                        message: "Erro ao deletar produto.",
+                    });
+                }
+            },
+        });
     };
 
     
@@ -98,13 +124,26 @@ const Stock = () => {
 
             <Navegate />
             <ProductPopup
-                isOpen={popupOpen}
-                onClose={() => setPopupOpen(false)}
+                isOpen={productPopupOpen}
+                onClose={() => setProductPopupOpen(false)}
                 onSuccess={() => {
-                    setPopupOpen(false);
+                    setProductPopupOpen(false);
                     fetchProducts();
                 }}
                 product={selectedProduct}
+            />
+
+            <UniversalPopup
+                open={universalPopupOpen}
+                title={popupTitle}
+                message={popupMessage}
+                onClose={() => setUniversalPopupOpen(false)}
+                onConfirm={popupConfirmAction || (() => setUniversalPopupOpen(false))}
+                onCancel={() => setUniversalPopupOpen(false)}
+                doubleButtonMode={popupDoubleButton}
+                confirmText="Confirmar"
+                cancelText="Cancelar"
+                singleButtonText="OK"
             />
 
             <div className="w-full flex flex-col items-center mb-8 sm:mt-16">
@@ -126,7 +165,7 @@ const Stock = () => {
                         className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                         onClick={() => {
                         setSelectedProduct(undefined);
-                        setPopupOpen(true);
+                        setProductPopupOpen(true);
                     }}
                     >
                         <PlusCircle className="mr-2 w-5 h-5" />
@@ -177,7 +216,7 @@ const Stock = () => {
                                     <button
                                         onClick={() => {
                                             setSelectedProduct(product);
-                                            setPopupOpen(true);
+                                            setProductPopupOpen(true);
                                         }}
                                         className="flex items-center gap-1 text-sm bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
                                     >

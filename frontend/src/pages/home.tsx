@@ -14,6 +14,7 @@ import CartPanelPc from "../components/cartPanelPc";
 import CartPanelMobile from "../components/cartPanelMobile";
 import CartButton from "../components/cartButton";
 import { Customer } from "../types/customerType";
+import UniversalPopup from "../components/universalPopup";
 
 function Home() {
     const token = StorageUtil.getItem("token");
@@ -26,6 +27,10 @@ function Home() {
     const [cartOpen, setCartOpen] = useState(false);
     const [customerId, setCustomerId] = useState<string>("1");
     const [customerList, setCustomerList] = useState<Customer[]>([]);
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [popupTitle, setPopupTitle] = useState("");
+    const [popupMessage, setPopupMessage] = useState("");
+    const [popupAction, setPopupAction] = useState<(() => void) | null>(null);
 
     const fetchCustomers = async () => {
         try {
@@ -141,8 +146,14 @@ function Home() {
     };
 
     const onClickBuy = async () => {
+        let message = "Carrinho vazio";
+        let title = "Adicione produtos ao carrinho antes de finalizar a compra.";
+
         if (!preview || !preview.items.length) {
-            alert("Adicione produtos ao carrinho antes de finalizar a compra.");
+            showPopup({
+                title,
+                message,
+            });
             return;
         }
 
@@ -163,18 +174,39 @@ function Home() {
             });
 
             if (response.code === 201 && response.data) {
-                alert("Compra realizada com sucesso!");
                 setSelectedItems([]);
                 setPreview(null);
                 setCartOpen(false);
                 fetchProducts();
+
+                title = "Compra finalizada com sucesso!";
+                message = "Venda realizada com sucesso!";
             } else {
-                console.error("Erro ao finalizar compra:", response.message);
+                title = "Erro ao finalizar compra";
+                message = response.message || "Ocorreu um erro ao processar a venda.";
             }
         } catch (error) {
+            message = "Ocorreu um erro ao processar a venda: " + (error instanceof Error ? error.message : "Erro desconhecido");
             console.error("Erro ao finalizar compra:", error);
+        } finally {
+            showPopup({
+                title,
+                message,
+                action: () => {
+                    if (title.includes("sucesso")) {
+                        fetchCustomers();
+                    }
+                },
+            });
         }
     };
+
+    function showPopup({ title, message, action }: { title: string, message: string, action?: () => void }) {
+        setPopupTitle(title);
+        setPopupMessage(message);
+        setPopupAction(() => action || null);
+        setPopupOpen(true);
+    }
 
     useEffect(() => {
         fetchProducts();
@@ -185,6 +217,15 @@ function Home() {
         <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 pb-20 pt-[calc(1rem+env(safe-area-inset-top))]">
             <LoginPopup />
             <Navegate />
+            <UniversalPopup
+                open={popupOpen}
+                title={popupTitle}
+                message={popupMessage}
+                onClose={() => {
+                    setPopupOpen(false);
+                    if (popupAction) popupAction();
+                }}
+            />
 
             {/* Conteúdo principal */}
             <main className="w-full max-w-8xl flex flex-col md:flex-row pr-0 md:pr-80 transition-all duration-300">

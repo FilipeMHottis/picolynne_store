@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "../utils/apiRequest";
 import { BACKEND_URL } from "../utils/env";
 import StorageUtil from "../utils/storageUtil";
 import { User } from "../types/user";
+import ProfilePopup from "../components/profilePopup";
+import { useNavigate } from "react-router-dom";
 import {
     UserIcon,
     Lock,
@@ -12,35 +14,45 @@ import {
     EyeOff,
 } from "lucide-react";
 
-interface Props {
-    user: User | undefined;
-    setUser: (user: User | undefined) => void;
-    formData: Partial<User>;
-    setFormData: (data: Partial<User>) => void;
-    setPopupOpen: (open: boolean) => void;
-    setUpdateSuccess: (success: boolean) => void;
-}
-
-function FormProfile(
-    {
-        user,
-        setUser,
-        formData,
-        setFormData,
-        setPopupOpen,
-        setUpdateSuccess,
-    }: Props
-) {
+function FormProfile() {
     const token = StorageUtil.getItem("token");
     const URL = BACKEND_URL + "/users";
+    const navigate = useNavigate();
+    const storedUser = StorageUtil.getItem("user");
+    const username = storedUser?.username;
     
     const [showPassword, setShowPassword] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [user, setUser] = useState<User | undefined>(undefined);
+    const [formData, setFormData] = useState<Partial<User>>({});
 
     const passwordsMatch = () => {
         return formData.password === confirmPassword && !!formData.password;
     };
 
+    const handleClosePopup = () => {
+        setPopupOpen(false);
+        StorageUtil.clear(); 
+        navigate("/login");
+    };
+
+    const fetchProfile = async () => {
+        try {
+            const response = await apiRequest<User>({
+                method: "GET",
+                url: `${URL}/username/${username}`,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setUser(response.data);
+            setFormData({ ...response.data, password: "" }); // não mostra senha
+        } catch (error) {
+            console.error("Erro ao buscar perfil do usuário:", error);
+        }
+    };
 
     const updateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,8 +80,18 @@ function FormProfile(
         }
     };
 
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
     return (
-        <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-6 mt-6">
+        <div className="w-full max-w-md mx-auto bg-white rounded-xl shadow-md p-6 mt-6">
+            <ProfilePopup
+                open={popupOpen}
+                success={updateSuccess}
+                onClose={handleClosePopup}
+            />
+            
             <h1 className="text-3xl font-bold mb-6 text-center flex items-center justify-center gap-2">
                 <UserIcon className="w-6 h-6 text-blue-600" />
                 Perfil do Usuário
