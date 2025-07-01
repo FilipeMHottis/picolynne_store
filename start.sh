@@ -1,5 +1,3 @@
-#!/bin/bash
-
 ENV_FILE=".env"
 ENV_EXAMPLE=".env.example"
 
