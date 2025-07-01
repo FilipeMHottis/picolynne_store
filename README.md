@@ -47,7 +47,13 @@
    cd picolynne-store
    ```
 
-2. **Execute o script de inicialização**:
+2. **Adicionar permissão de execução**:
+    
+    ```bash
+    chmod +x start.sh
+    ```
+
+3. **Execute o script de inicialização**:
 
    ```bash
    ./start.sh
