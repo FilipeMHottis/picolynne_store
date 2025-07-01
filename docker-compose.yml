@@ -13,13 +13,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:${DB_PORT}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
 
   backend:
     build:
       context: ./backend
     container_name: backend_app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
