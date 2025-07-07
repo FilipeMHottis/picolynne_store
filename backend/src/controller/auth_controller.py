@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from ..service.user_service import UserService
 from ..typings.user_typing import UserLogin
-from .user_controller import handle_response, get_user_service
-
+from .user_controller import get_user_service
+from ..utils.handle_response import handle_response
 
 router = APIRouter()
 

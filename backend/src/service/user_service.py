@@ -87,7 +87,7 @@ class UserService:
                 data=None,
             )
 
-    def update_user(self, user_id: int, user: UserCreate) -> Response[User]:
+    def update_user(self, user_id: int, user: User) -> Response[User]:
         try:
             user = self.user_model.update_user(user_id, user)
             return Response(
