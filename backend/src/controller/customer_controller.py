@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..service.customer_service import CustomerService
 from ..typings.customer_typing import Customer
 from ..config.dependencies import get_db
+from ..utils.handle_response import handle_response
 
 router = APIRouter()
 
@@ -10,13 +11,6 @@ router = APIRouter()
 def get_customer_service(db: Session = Depends(get_db)) -> CustomerService:
     """Cria uma instância única do CustomerService como dependência."""
     return CustomerService(db)
-
-
-# Função utilitária para tratar as respostas
-def handle_response(response):
-    if response.code != 200 and response.code != 201:
-        raise HTTPException(status_code=response.code, detail=response.message)
-    return response
 
 
 @router.get("/customers")

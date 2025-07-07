@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..service.product_service import ProductService
 from ..typings.product_typing import ProductCreate
 from ..config.dependencies import get_db
+from ..utils.handle_response import handle_response
 
 router = APIRouter()
 
@@ -10,12 +11,6 @@ router = APIRouter()
 def get_product_service(db: Session = Depends(get_db)) -> ProductService:
     """Cria uma instância única do ProductService como dependência."""
     return ProductService(db)
-
-
-def handle_response(response):
-    if response.code != 200 and response.code != 201:
-        raise HTTPException(status_code=response.code, detail=response.message)
-    return response
 
 
 @router.get("/products")

@@ -18,6 +18,7 @@ class UserCreate(BaseModel):
 class TokenData(TypedDict):
     username: str
     role: str
+    exp: float
 
 
 class UserLogin(BaseModel):

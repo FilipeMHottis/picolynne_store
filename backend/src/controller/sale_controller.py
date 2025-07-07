@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..config.dependencies import get_db
 from ..service.sale_service import SaleService
 from ..typings.sale_typing import SaleCreate
+from ..utils.handle_response import handle_response
 
 router = APIRouter()
 
@@ -10,12 +11,6 @@ router = APIRouter()
 def get_sale_service(db: Session = Depends(get_db)) -> SaleService:
     """Cria uma instância única do SaleService como dependência."""
     return SaleService(db)
-
-
-def handle_response(response):
-    if response.code != 200 and response.code != 201:
-        raise HTTPException(status_code=response.code, detail=response.message)
-    return response
 
 
 @router.get("/sales")
