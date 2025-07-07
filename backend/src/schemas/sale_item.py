@@ -1,15 +1,15 @@
-from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..database.database import Base
 
 
 class SaleItemBase(Base):
     __tablename__ = "sale_items"
 
-    id = Column(Integer, primary_key=True, index=True)
-    sale_id = Column(Integer, ForeignKey("sales.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    quantity = Column(Integer)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    sale_id: Mapped[int] = mapped_column(ForeignKey("sales.id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    quantity: Mapped[int] = mapped_column(nullable=True)
 
     sale = relationship("SaleBase", back_populates="sale_items")
     product = relationship("ProductBase", back_populates="sale_items")

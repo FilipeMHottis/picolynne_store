@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
 from ..database.database import Base
 from .product_tag import ProductTagAssociation
 
@@ -7,11 +7,11 @@ from .product_tag import ProductTagAssociation
 class ProductBase(Base):
     __tablename__ = "products"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    img_link = Column(String, nullable=True)
-    stock = Column(Integer, default=0)
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
+    img_link: Mapped[str] = mapped_column(nullable=True)
+    stock: Mapped[str] = mapped_column(default=0)
+    category_id: Mapped[str] = mapped_column(ForeignKey("categories.id"))
 
     category = relationship(
         "CategoryBase",

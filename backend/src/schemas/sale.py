@@ -1,15 +1,15 @@
-from sqlalchemy import Column, Integer, ForeignKey, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..database.database import Base
 
 
 class SaleBase(Base):
     __tablename__ = "sales"
 
-    id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"))
-    total_quantity = Column(Integer)
-    total_price = Column(Float)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"))
+    total_quantity: Mapped[float] = mapped_column(nullable=True)
+    total_price: Mapped[float] = mapped_column(nullable=True)
 
     customer = relationship("CustomerBase", back_populates="sales")
     sale_items = relationship("SaleItemBase", back_populates="sale")

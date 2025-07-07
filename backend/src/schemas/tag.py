@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..database.database import Base
 from .product_tag import ProductTagAssociation
 
@@ -7,8 +6,8 @@ from .product_tag import ProductTagAssociation
 class TagBase(Base):
     __tablename__ = "tags"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
 
     products = relationship(
         "ProductBase",

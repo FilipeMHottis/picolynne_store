@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 from ..database.database import Base
 
@@ -6,10 +6,10 @@ from ..database.database import Base
 class CategoryBase(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    price = Column(Float)
-    price_above_20_units = Column(Float)
-    price_above_50_units = Column(Float)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(unique=True, index=True)
+    price: Mapped[float] = mapped_column(nullable=True)
+    price_above_20_units: Mapped[float] = mapped_column(nullable=True)
+    price_above_50_units: Mapped[float] = mapped_column(nullable=True)
 
     products = relationship("ProductBase", back_populates="category")
