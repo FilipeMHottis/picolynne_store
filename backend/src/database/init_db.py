@@ -3,14 +3,16 @@ from sqlalchemy.orm import Session
 from .database import Base, engine, SessionLocal
 
 # Importar todos os modelos para garantir que as tabelas sejam criadas
-from ..schemas.category import CategoryBase  # noqa: F401
-from ..schemas.tag import TagBase  # noqa: F401
-from ..schemas.product_tag import ProductTagAssociation  # noqa: F401
-from ..schemas.product import ProductBase  # noqa: F401
-from ..schemas.sale import SaleBase  # noqa: F401
-from ..schemas.sale_item import SaleItemBase  # noqa: F401
-from ..schemas.customer import CustomerBase  # noqa: F401
-from ..schemas.user import UserBase  # noqa: F401
+from ..schemas.category import CategoryBase  # type: ignore # noqa: F401
+from ..schemas.tag import TagBase  # type: ignore # noqa: F401
+from ..schemas.product_tag import (  # noqa: F401
+    ProductTagAssociation,  # type: ignore
+)
+from ..schemas.product import ProductBase  # type: ignore # noqa: F401
+from ..schemas.sale import SaleBase  # type: ignore # noqa: F401
+from ..schemas.sale_item import SaleItemBase  # type: ignore # noqa: F401
+from ..schemas.customer import CustomerBase  # type: ignore # noqa: F401
+from ..schemas.user import UserBase  # type: ignore # noqa: F401
 
 # Criar usuário administrador
 from ..service.user_service import UserService

@@ -1,4 +1,6 @@
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
+from typing import Callable, Awaitable
 from starlette.requests import Request
 from starlette.responses import Response
 from src.service.user_service import UserService
@@ -14,13 +16,16 @@ pages_not_requiring_auth = [
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app):
+    def __init__(self, app: ASGIApp):
         super().__init__(app)
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(
+        self, request: Request,
+        call_next: Callable[[Request], Awaitable[Response]]
+    ):
         if request.method == "OPTIONS":
             return await call_next(request)
-        
+
         if request.url.path in pages_not_requiring_auth:
             return await call_next(request)
 
