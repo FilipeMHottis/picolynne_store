@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -17,7 +18,11 @@ from ..utils.auth_utils import (
 
 
 def user_for_token(user: User) -> TokenData:
-    return {"username": user.username, "role": user.role}
+    return TokenData(
+        username=user.username,
+        role=user.role,
+        exp=int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp()),
+    )
 
 
 class UserModel:
@@ -126,13 +131,17 @@ class UserModel:
         try:
             db_user = self.get_user_by_username(user.username)
 
+            # Se o usuário não for encontrado ou a senha estiver incorreta,
+            if not db_user:
+                raise Exception("User or password is incorrect")
+            # se a senha não corresponder, também lançar uma exceção
+            if not verify_password(user.password, db_user.password):
+                raise Exception("User or password is incorrect")
+
             return create_access_token(
                 user_for_token(db_user),
             )
         except Exception as e:
-            # Por segurançao nao pode retornar o erro original
-            # para evitar vazamento de informações
-            # raise Exception("User or password is incorrect")
             raise Exception(f"Authentication error: {str(e)}")
 
     def decode_token(self, token: str) -> TokenData:

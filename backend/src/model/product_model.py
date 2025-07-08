@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from .category_model import CategoryModel
@@ -14,13 +14,13 @@ from sqlalchemy import func
 
 
 def return_category_and_tags(
-    db,
+    db: Session,
     category_id: int,
     tags_id: List[int],
-):
+) -> Tuple[Category, List[Tag]]:
     """Retorna a categoria e tags completas, com validação adequada."""
     category = CategoryModel(db).get_category_by_id(category_id)
-    tags = []
+    tags: List[Tag] = []
 
     if not category:
         raise Exception(f"Product with category id {category_id} not found")
@@ -47,19 +47,22 @@ class ProductModel:
             result = self.db.query(ProductBase).all()
 
             # Cada produto, busca informações completas da categoria e tags
-            products = []
+            products: List[Product] = []
             for product in result:
                 category, tags = return_category_and_tags(
                     self.db,
-                    product.category_id,
+                    int(product.category_id),
                     [tag.id for tag in product.tags],
                 )
 
                 # Criando um objeto Product com categoria e tags completas
                 product_data = Product.model_validate(product)
-                product_data.category = (
-                    Category.model_validate(category) if category else None
+                [category, tags] = return_category_and_tags(
+                    self.db,
+                    int(product.category_id),
+                    [tag.id for tag in product.tags],
                 )
+                product_data.category = category
                 product_data.tags = [Tag.model_validate(tag) for tag in tags]
 
                 products.append(product_data)
@@ -80,19 +83,22 @@ class ProductModel:
                 .first()
             )
             if not product:
-                return None  # Retorna None se o produto não for encontrado
+                return None
 
             category, tags = return_category_and_tags(
                 self.db,
-                product.category_id,
+                int(product.category_id),
                 [tag.id for tag in product.tags],
             )
 
             # Preenchendo o retorno com categoria e tags completas
             product_data = Product.model_validate(product)
-            product_data.category = (
-                Category.model_validate(category) if category else None
+            category, tags = return_category_and_tags(
+                self.db,
+                int(product.category_id),
+                [tag.id for tag in product.tags],
             )
+            product_data.category = category
             product_data.tags = [Tag.model_validate(tag) for tag in tags]
 
             return product_data
@@ -105,22 +111,23 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(func.lower(ProductBase.name).like(f"%{product_name.lower()}%"))
+                .filter(
+                    func.lower(ProductBase.name)
+                    .like(f"%{product_name.lower()}%")
+                )
                 .all()
             )
 
-            products = []
+            products: List[Product] = []
             for product in result:
                 category, tags = return_category_and_tags(
                     self.db,
-                    product.category_id,
+                    int(product.category_id),
                     [tag.id for tag in product.tags],
                 )
 
                 product_data = Product.model_validate(product)
-                product_data.category = (
-                    Category.model_validate(category) if category else None
-                )
+                product_data.category = category
                 product_data.tags = [Tag.model_validate(tag) for tag in tags]
 
                 products.append(product_data)
@@ -135,15 +142,18 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(func.lower(ProductBase.category.has().name).like(f"%{category_name.lower()}%"))
+                .filter(
+                    func.lower(ProductBase.category.has().name)
+                    .like(f"%{category_name.lower()}%")
+                )
                 .all()
             )
 
-            products = []
+            products: List[Product] = []
             for product in result:
                 category, tags = return_category_and_tags(
                     self.db,
-                    product.category_id,
+                    int(product.category_id),
                     [tag.id for tag in product.tags],
                 )
 
@@ -163,23 +173,26 @@ class ProductModel:
         try:
             result = (
                 self.db.query(ProductBase)
-                .filter(ProductBase.tags.any(func.lower(TagBase.name).like(f"%{tag_name.lower()}%")))
+                .filter(
+                    ProductBase.tags.any(
+                        func.lower(TagBase.name)
+                        .like(f"%{tag_name.lower()}%")
+                        )
+                    )
                 .all()
             )
 
-            products = []
+            products: List[Product] = []
             for product in result:
                 category, tags = return_category_and_tags(
                     self.db,
-                    product.category_id,
+                    int(product.category_id),
                     [tag.id for tag in product.tags],
                 )
 
                 # Criando um objeto Product com categoria e tags completas
                 product_data = Product.model_validate(product)
-                product_data.category = (
-                    Category.model_validate(category) if category else None
-                )
+                product_data.category = category
                 product_data.tags = [Tag.model_validate(tag) for tag in tags]
 
                 products.append(product_data)
@@ -250,19 +263,34 @@ class ProductModel:
             if not product_to_update:
                 raise Exception("Product not found.")
 
-            category, tags = return_category_and_tags(
-                self.db,
-                product_data.category_id,
-                product_data.tags_id,
+            # Fazer product_to_update seja do tipo Product
+            product_to_update: Product = Product(
+                id=product_to_update.id,
+                name=product_to_update.name,
+                img_link=product_to_update.img_link,
+                stock=product_to_update.stock,
+                category=Category.model_validate(product_to_update.category),
+                tags=[
+                    Tag.model_validate(tag) for tag in product_to_update.tags
+                ],
             )
 
-            if not category:
+            if not product_to_update.category:
                 raise Exception("Category not found.")
+
+            if product_to_update.category.id is None:
+                raise Exception("Category ID is None.")
 
             product_to_update.name = product_data.name
             product_to_update.img_link = product_data.img_link
-            product_to_update.category_id = category.id
             product_to_update.stock = product_data.stock
+
+            category, tags = return_category_and_tags(
+                self.db,
+                product_data.category_id,
+                [tag_id for tag_id in product_data.tags_id],
+            )
+            product_to_update.category = category
 
             self.db.execute(
                 ProductTagAssociation.delete().where(
@@ -278,11 +306,16 @@ class ProductModel:
             self.db.commit()
             self.db.refresh(product_to_update)
 
-            product_data = Product.model_validate(product_to_update)
-            product_data.category = Category.model_validate(category)
-            product_data.tags = [Tag.model_validate(tag) for tag in tags]
+            updated_product: Product = Product(
+                id=product_to_update.id,
+                name=product_to_update.name,
+                img_link=product_to_update.img_link,
+                stock=product_to_update.stock,
+                category=Category.model_validate(category),
+                tags=[Tag.model_validate(tag) for tag in tags],
+            )
 
-            return product_data
+            return updated_product
 
         except SQLAlchemyError as e:
             self.db.rollback()

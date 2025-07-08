@@ -13,7 +13,7 @@ from .product_model import ProductModel
 from .customer_model import CustomerModel
 
 
-def product_return(
+def _product_return(
     db: Session,
     product_id: int,
     quantity: int,
@@ -26,8 +26,11 @@ def product_return(
     if product is None:
         raise Exception(f"Product {product_id} not found.")
 
+    if product.id is None:
+        raise Exception(f"Product {product_id} has no ID.")
+
     # Só checa o estoque se for para atualizar o estoque
-    if update_stock and product.stock < quantity:
+    if update_stock and (product.stock is None or product.stock < quantity):
         raise Exception(f"Product {product_id} out of stock.")
 
     if update_stock:
@@ -43,22 +46,27 @@ def product_return(
     else:
         price = product.category.price
 
-    return SaleItem(
+    return SaleItemBase(
         product_id=product.id,
         product_name=product.name,
         quantity=quantity,
         price=price,
+        category_id=product.category.id,
+        category_name=product.category.name,
     )
 
 
-def customer_return(
+def _customer_return(
     db: Session,
     customer_id: int,
-) -> CustomerSale:
+) -> Optional[CustomerSale]:
     customer = CustomerModel(db).get_customer_by_id(customer_id)
 
     if customer is None:
         raise Exception(f"Customer {customer_id} not found.")
+
+    if customer.id is None:
+        raise Exception(f"Customer {customer_id} has no ID.")
 
     return CustomerSale(
         id=customer.id,
@@ -76,29 +84,30 @@ class SaleModel:
             returned_sales: List[Sale] = []
 
             for sale in result:
-                customer = customer_return(self.db, sale.customer_id)
+                customer = _customer_return(self.db, sale.customer_id)
                 items = (
                     self.db.query(SaleItemBase)
                     .filter(SaleItemBase.sale_id == sale.id)
                     .all()
                 )
 
-                items_dict = [item.__dict__.copy() for item in items]
-
-                items_dict = [
-                    product_return(
-                        self.db,
-                        item["product_id"],
-                        item["quantity"],
-                        sale.total_quantity,
-                        update_stock=False,  # <- Aqui você já tentou evitar mexer no estoque
+                items_list = [
+                    SaleItem(
+                        id=item.id,
+                        sale_id=item.sale_id,
+                        product_id=item.product_id,
+                        product_name=item.product_name,
+                        category_id=item.category_id,
+                        category_name=item.category_name,
+                        quantity=item.quantity,
+                        price=item.price,
                     )
-                    for item in items_dict
+                    for item in items
                 ]
 
                 sale_dict = sale.__dict__.copy()
                 sale_dict["customer"] = customer
-                sale_dict["items"] = items_dict
+                sale_dict["items"] = items_list
                 returned_sales.append(Sale.model_validate(sale_dict))
 
             return returned_sales
@@ -119,7 +128,7 @@ class SaleModel:
             if not result:
                 raise Exception("Sale not found.")
 
-            customer = customer_return(self.db, result.customer_id)
+            customer = _customer_return(self.db, result.customer_id)
 
             items = (
                 self.db.query(SaleItemBase)
@@ -127,16 +136,18 @@ class SaleModel:
                 .all()
             )
 
-            items_dict = [item.__dict__.copy() for item in items]
             items_dict = [
-                product_return(
-                    self.db,
-                    item["product_id"],
-                    item["quantity"],
-                    result.total_quantity,
-                    update_stock=False,
+                SaleItem(
+                    id=item.id,
+                    sale_id=item.sale_id,
+                    product_id=item.product_id,
+                    product_name=item.product_name,
+                    category_id=item.category_id,
+                    category_name=item.category_name,
+                    quantity=item.quantity,
+                    price=item.price,
                 )
-                for item in items_dict
+                for item in items
             ]
 
             sale_dict = result.__dict__.copy()
@@ -165,7 +176,7 @@ class SaleModel:
     def create_sale(self, sale_data: SaleCreate) -> Sale:
         """Cria uma nova venda com itens."""
         try:
-            customer = customer_return(self.db, sale_data.customer_id)
+            customer = _customer_return(self.db, sale_data.customer_id)
             total_quantity_for_price = 0
             total_price = 0
             items: List[SaleItem] = []
@@ -177,14 +188,15 @@ class SaleModel:
                 total_quantity_for_price += item.quantity
 
             for item in sale_data.items:
-                product = product_return(
+                product = _product_return(
                     self.db,
                     item.product_id,
                     item.quantity,
                     total_quantity_for_price,
+                    update_stock=True,
                 )
 
-                if product is None:
+                if product.id is None:
                     raise Exception(f"Product {item.product_id} not found.")
 
                 total_price += product.price * product.quantity
@@ -252,7 +264,7 @@ class SaleModel:
 
     def preview_sale(self, sale_data: SaleCreate) -> Sale:
         """Retorna uma prévia da venda sem realizar nenhuma operação no db."""
-        customer = customer_return(self.db, sale_data.customer_id)
+        customer = _customer_return(self.db, sale_data.customer_id)
         total_quantity_for_price = 0
         total_price = 0
         items: List[SaleItem] = []
@@ -264,7 +276,7 @@ class SaleModel:
             total_quantity_for_price += item.quantity
 
         for item in sale_data.items:
-            product = product_return(
+            product = _product_return(
                 self.db,
                 item.product_id,
                 item.quantity,
@@ -272,7 +284,7 @@ class SaleModel:
                 update_stock=False,
             )
 
-            if product is None:
+            if product.id is None:
                 raise Exception(f"Product {item.product_id} not found.")
 
             total_price += product.price * product.quantity

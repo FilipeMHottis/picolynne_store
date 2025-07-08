@@ -1,5 +1,6 @@
 from typing import Optional, List, TypedDict
 from pydantic import BaseModel
+from datetime import datetime, timezone
 
 
 class CustomerSale(TypedDict):
@@ -8,8 +9,12 @@ class CustomerSale(TypedDict):
 
 
 class SaleItem(BaseModel):
+    id: Optional[int]
+    sale_id: Optional[int]
     product_id: int
     product_name: str
+    category_id: int
+    category_name: str
     quantity: int
     price: float
 
@@ -21,6 +26,7 @@ class SaleItemForCreate(TypedDict):
 
 class Sale(BaseModel):
     id: Optional[int]
+    date: Optional[datetime] = datetime.now(timezone.utc)
     customer: CustomerSale
     items: List[SaleItem]
     total_quantity: int

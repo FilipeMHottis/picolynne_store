@@ -10,8 +10,8 @@ class ProductBase(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)
     img_link: Mapped[str] = mapped_column(nullable=True)
-    stock: Mapped[str] = mapped_column(default=0)
-    category_id: Mapped[str] = mapped_column(ForeignKey("categories.id"))
+    stock: Mapped[int] = mapped_column(default=0)
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
 
     category = relationship(
         "CategoryBase",

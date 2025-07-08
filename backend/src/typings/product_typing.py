@@ -9,7 +9,7 @@ class Product(BaseModel):
     name: str
     img_link: str
     category: Category
-    stock: Optional[int] = 0  # Correção aqui
+    stock: Optional[int] = 0
     tags: List[Tag] = []
 
     class Config:
