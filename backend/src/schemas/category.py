@@ -13,3 +13,8 @@ class CategoryBase(Base):
     price_above_50_units: Mapped[float] = mapped_column(nullable=True)
 
     products = relationship("ProductBase", back_populates="category")
+    sale_items = relationship(
+        "SaleItemBase",
+        back_populates="category",
+        foreign_keys="SaleItemBase.category_id",
+    )

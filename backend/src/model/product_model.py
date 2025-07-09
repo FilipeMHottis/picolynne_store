@@ -77,6 +77,7 @@ class ProductModel:
         try:
             product = (
                 self.db.query(ProductBase)
+                .options(joinedload(ProductBase.category))
                 .filter(
                     ProductBase.id == product_id,
                 )
@@ -346,7 +347,10 @@ class ProductModel:
 
         except SQLAlchemyError as e:
             self.db.rollback()
-            raise Exception(f"Database error: {str(e)}")
+            raise Exception(f"Erro no banco de dados: {str(e)}")
+
+        except Exception as e:
+            raise Exception(f"Erro ao deletar produto: {str(e)}")
 
     def update_stock(self, product_id: int, quantity: int) -> Product:
         """Atualiza o estoque de um produto."""

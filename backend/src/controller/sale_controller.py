@@ -1,21 +1,15 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from ..config.dependencies import get_db
 from ..service.sale_service import SaleService
 from ..typings.sale_typing import SaleCreate
 from ..utils.handle_response import handle_response
+from ..utils.get_serverce import get_service
 
 router = APIRouter()
 
 
-def get_sale_service(db: Session = Depends(get_db)) -> SaleService:
-    """Cria uma instância única do SaleService como dependência."""
-    return SaleService(db)
-
-
 @router.get("/sales")
 def get_all_sales(
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para pegar todas as vendas."""
     response = sale_service.get_all_sales()
@@ -25,7 +19,7 @@ def get_all_sales(
 @router.get("/sales/{sale_id}")
 def get_sale_by_id(
     sale_id: int,
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para pegar uma venda pelo seu ID."""
     response = sale_service.get_sale_by_id(sale_id)
@@ -35,17 +29,17 @@ def get_sale_by_id(
 @router.get("/sales/customer/{customer_id}")
 def search_sales_by_customer(
     customer_id: int,
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para buscar vendas por cliente."""
-    response = sale_service.search_sales_by_customer(customer_id)
+    response = sale_service.get_sale_by_customer_id(customer_id)
     return handle_response(response)
 
 
 @router.post("/sales")
 def create_sale(
     sale: SaleCreate,
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para criar uma nova venda."""
     response = sale_service.create_sale(sale)
@@ -55,7 +49,7 @@ def create_sale(
 @router.delete("/sales/{sale_id}")
 def delete_sale(
     sale_id: int,
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para deletar uma venda."""
     response = sale_service.delete_sale(sale_id)
@@ -65,7 +59,7 @@ def delete_sale(
 @router.post("/sales/preview")
 def preview_sale(
     sale: SaleCreate,
-    sale_service: SaleService = Depends(get_sale_service),
+    sale_service: SaleService = Depends(get_service(SaleService)),
 ):
     """Rota para visualizar uma venda antes de criá-la."""
     response = sale_service.preview_sale(sale)

@@ -16,6 +16,7 @@ class SaleItemBase(Base):
     )
     category_name: Mapped[str] = mapped_column(nullable=True)
     quantity: Mapped[int] = mapped_column(nullable=True)
+    price: Mapped[float] = mapped_column(nullable=True)
 
     sale = relationship("SaleBase", back_populates="sale_items")
     product = relationship("ProductBase", back_populates="sale_items")

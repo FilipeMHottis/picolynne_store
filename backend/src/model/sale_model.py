@@ -19,17 +19,17 @@ def _product_return(
     quantity: int,
     total_quantity_for_price: int,
     update_stock: bool = True,
+    sale_id: Optional[int] = None,
 ) -> SaleItem:
     product = ProductModel(db).get_product_by_id(product_id)
     price = 0
 
     if product is None:
-        raise Exception(f"Product {product_id} not found.")
+        raise Exception(f"Product {product_id} not found. {product}")
 
     if product.id is None:
         raise Exception(f"Product {product_id} has no ID.")
 
-    # Só checa o estoque se for para atualizar o estoque
     if update_stock and (product.stock is None or product.stock < quantity):
         raise Exception(f"Product {product_id} out of stock.")
 
@@ -46,13 +46,18 @@ def _product_return(
     else:
         price = product.category.price
 
-    return SaleItemBase(
+    if product.category.id is None:
+        raise Exception(f"Product {product_id} has no category.")
+
+    return SaleItem(
+        id=None,
+        sale_id=sale_id,
         product_id=product.id,
         product_name=product.name,
-        quantity=quantity,
-        price=price,
         category_id=product.category.id,
         category_name=product.category.name,
+        quantity=quantity,
+        price=price,
     )
 
 
@@ -196,7 +201,7 @@ class SaleModel:
                     update_stock=True,
                 )
 
-                if product.id is None:
+                if str(product.product_id) == "None":
                     raise Exception(f"Product {item.product_id} not found.")
 
                 total_price += product.price * product.quantity
@@ -216,7 +221,11 @@ class SaleModel:
                 new_item = SaleItemBase(
                     sale_id=new_sale.id,
                     product_id=item.product_id,
+                    product_name=item.product_name,
                     quantity=item.quantity,
+                    price=item.price,
+                    category_id=item.category_id,
+                    category_name=item.category_name,
                 )
                 self.db.add(new_item)
 
@@ -284,8 +293,9 @@ class SaleModel:
                 update_stock=False,
             )
 
-            if product.id is None:
-                raise Exception(f"Product {item.product_id} not found.")
+            # Se existe product_id
+            if str(product.product_id) == "None":
+                raise Exception(f"Product {item.product_id} not found. {item}")
 
             total_price += product.price * product.quantity
             items.append(product)

@@ -98,7 +98,7 @@ class TagService:
                 data=None,
             )
 
-    def update_tag(self, tag_id: int, tag_data: dict) -> Response[Tag]:
+    def update_tag(self, tag_id: int, tag_data: Tag) -> Response[Tag]:
         """
         Atualiza uma tag existente no banco de dados.
         """

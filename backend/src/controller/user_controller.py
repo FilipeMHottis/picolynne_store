@@ -7,8 +7,6 @@ from ..utils.get_serverce import get_service
 router = APIRouter()
 
 
-# Função utilitária para tratar as respostas
-
 @router.get("/users")
 def get_all_users(
     user_service: UserService = Depends(get_service(UserService)),

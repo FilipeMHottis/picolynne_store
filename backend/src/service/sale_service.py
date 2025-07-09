@@ -80,7 +80,7 @@ class SaleService:
                 data=None,
             )
 
-    def delete_sale(self, sale_id: int) -> Response:
+    def delete_sale(self, sale_id: int) -> Response[None]:
         try:
             self.sale_model.delete_sale(sale_id)
             return Response(
@@ -99,7 +99,7 @@ class SaleService:
                 detail=f"Error deleting sale: {str(e)}",
             )
 
-    def preview_sale(self, sale_data: SaleCreate) -> Response:
+    def preview_sale(self, sale_data: SaleCreate) -> Response[Sale]:
         try:
             preview = self.sale_model.preview_sale(sale_data)
             return Response(

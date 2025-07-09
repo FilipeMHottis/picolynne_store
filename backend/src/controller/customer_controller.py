@@ -1,21 +1,15 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from ..service.customer_service import CustomerService
 from ..typings.customer_typing import Customer
-from ..config.dependencies import get_db
 from ..utils.handle_response import handle_response
+from ..utils.get_serverce import get_service
 
 router = APIRouter()
 
 
-def get_customer_service(db: Session = Depends(get_db)) -> CustomerService:
-    """Cria uma instância única do CustomerService como dependência."""
-    return CustomerService(db)
-
-
 @router.get("/customers")
 def get_all_customers(
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para pegar todas as customers."""
     response = customer_service.get_all_customers()
@@ -25,7 +19,7 @@ def get_all_customers(
 @router.get("/customers/{customer_id}")
 def get_customer_by_id(
     customer_id: int,
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para pegar uma customer pelo seu ID."""
     response = customer_service.get_customer_by_id(customer_id)
@@ -35,7 +29,7 @@ def get_customer_by_id(
 @router.get("/customers/name/{customer_name}")
 def get_customer_by_name(
     customer_name: str,
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para pegar uma customer pelo seu nome."""
     response = customer_service.get_customer_by_name(customer_name)
@@ -45,7 +39,7 @@ def get_customer_by_name(
 @router.post("/customers")
 def create_customer(
     customer: Customer,
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para criar uma nova customer."""
     response = customer_service.create_customer(customer)
@@ -56,7 +50,7 @@ def create_customer(
 def update_customer(
     customer_id: int,
     customer_data: Customer,
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para atualizar uma customer."""
     response = customer_service.update_customer(customer_id, customer_data)
@@ -66,7 +60,7 @@ def update_customer(
 @router.delete("/customers/{customer_id}")
 def delete_customer(
     customer_id: int,
-    customer_service: CustomerService = Depends(get_customer_service),
+    customer_service: CustomerService = Depends(get_service(CustomerService)),
 ):
     """Rota para deletar uma customer."""
     response = customer_service.delete_customer(customer_id)
